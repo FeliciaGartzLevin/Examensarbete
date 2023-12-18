@@ -10,7 +10,7 @@ import { SignOutPage } from "./pages/guest-routes/SignOutPage"
 
 export const App = () => {
 	return (
-		<>
+		<div className="h-screen font-primary">
 			<NavigationMenu />
 			<div>
 				<Routes>
@@ -28,7 +28,7 @@ export const App = () => {
 				</Routes>
 			</div>
 
-		</>
+		</div>
 	)
 }
 

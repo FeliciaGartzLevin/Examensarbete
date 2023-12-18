@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	.defaultInputStyling {
+		@apply shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none;
+	}
+
+	.errorInputStyling {
+		@apply shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none border border-red-alert
+	}
+
+	.labelStyling {
+		@apply block text-gray-700 text-sm font-bold mb-2
+	}
+
+	.errorMsgStyling {
+		@apply text-xs text-red-alert italic
+	}
+}
