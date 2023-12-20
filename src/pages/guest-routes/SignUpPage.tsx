@@ -3,15 +3,17 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/Button'
 import { SignUpSchema, signUpSchema } from '../../schemas/AuthSchemas'
+import { useAuthContext } from '../../hooks/useAuthContext'
 
 export const SignUpPage = () => {
 	const { handleSubmit, register, formState: { errors } } = useForm<SignUpSchema>({
 		resolver: zodResolver(signUpSchema)
 	})
+	const { signup } = useAuthContext()
 
 	const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
 		console.log('signing up user to firebase with data', data)
-
+		signup(data.email, data.name, data.password)
 	}
 
 	return (
