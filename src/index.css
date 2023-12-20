@@ -8,7 +8,7 @@
 	}
 
 	.errorInputStyling {
-		@apply shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none border border-red-alert
+		@apply shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none border border-alert-red
 	}
 
 	.labelStyling {
@@ -16,6 +16,6 @@
 	}
 
 	.errorMsgStyling {
-		@apply text-xs text-red-alert italic
+		@apply text-xs text-alert-red italic
 	}
 }
