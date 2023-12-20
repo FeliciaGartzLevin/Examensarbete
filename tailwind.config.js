@@ -11,7 +11,7 @@ export default {
 				'primary-text': '#0F172A',
 				'light-background': '#FAF9F2',
 				'dark-background': '#253C33',
-				'link-hover': '#11643F',
+				'link-hover': '#188C57',
 				'button-bg': '#19945D',
 				'red-alert': 'rgb(239 68 68)'
 			},

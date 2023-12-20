@@ -1,37 +1,67 @@
-import { Link } from "react-router-dom"
-import { Button } from "../../components/Button"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { Link } from 'react-router-dom'
+import { Button } from '../../components/Button'
+import { SignInSchema, signInSchema } from '../../schemas/AuthSchemas'
 
 export const SignInPage = () => {
+	const { handleSubmit, register, formState: { errors } } = useForm<SignInSchema>({
+		resolver: zodResolver(signInSchema)
+	})
+
+	const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
+		console.log('signing in user to firebase with data', data)
+
+	}
+
 	return (
 		<div className="h-screen bg-dark-background flex justify-center items-center">
 			<div className="w-full max-w-xs">
-				<form className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
-					<div className='text-lg text-center font-bold mb-2'>
-						Sign In
-					</div>
-					<div className="text-center text-gray-500 text-xs mb-4">
-						<p>Sign in to your user profile.</p>
-					</div>
+				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
+					<h2 className='text-lg text-center font-bold mb-1'>
+						Sign in
+					</h2>
+
 					<div className="mb-4">
-						<label className="block text-gray-700 text-sm font-bold mb-2" aria-label="email">
+						<label className="labelStyling" aria-label="email">
 							Email
 						</label>
-						<input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" aria-labelledby="email" type="text" placeholder="Email" />
+						<input
+							className={errors.email ? "errorInputStyling" : "defaultInputStyling"}
+							aria-labelledby="email"
+							type="email"
+							placeholder="Your email"
+							{...register('email')}
+						/>
+						{errors.email && <p className="errorMsgStyling">{errors.email.message ?? "Invalid value"}</p>}
 					</div>
+
 					<div className="mb-6">
-						<label className="block text-gray-700 text-sm font-bold mb-2" aria-label="password">
+						<label className="labelStyling" aria-label="password">
 							Password
 						</label>
-						<input className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" aria-labelledby="password" type="password" placeholder="******************" />
-						<p className="text-red-500 text-xs italic">Please choose a password.</p>
+						<input
+							className={errors.password ? "errorInputStyling" : "defaultInputStyling"}
+							aria-labelledby="password"
+							type="password"
+							placeholder="******************"
+							{...register('password')}
+						/>
+						{errors.password && <p className="errorMsgStyling">{errors.password.message ?? "Invalid value"}</p>}
+
 					</div>
-					<div className="flex items-center justify-between">
-						<Link to='/forgot-password' className="inline-block align-baseline font-bold text-sm text-button-bg hover:text-link-hover">
-							Forgot Password?
-						</Link>
-						<Button onClick={() => console.log('clicked sign up button 👆🏽')}>Sign in</Button>
+
+					<div className="flex justify-between items-center">
+						<Link to='/forgot-password' className='font-bold  hover:text-link-hover text-green-900'>Forgot password?</Link>
+						<Button type='submit'>Sign in</Button>
 					</div>
 				</form>
+				<div className="text-center text-light-background text-xs">
+					<p>Don't have an account?</p>
+					<p>
+						Go to <Link className='font-bold hover:text-link-hover' to='/sign-up'>sign up</Link>.
+					</p>
+				</div>
 			</div>
 		</div>
 	)

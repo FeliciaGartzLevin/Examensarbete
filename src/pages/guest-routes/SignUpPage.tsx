@@ -2,27 +2,28 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/Button'
-import { SignUpSchema, signUpSchema } from '../../schemas/SignUpSchema'
+import { SignUpSchema, signUpSchema } from '../../schemas/AuthSchemas'
 
 export const SignUpPage = () => {
-	const { handleSubmit, register, watch, formState: { errors } } = useForm<SignUpSchema>({
+	const { handleSubmit, register, formState: { errors } } = useForm<SignUpSchema>({
 		resolver: zodResolver(signUpSchema)
 	})
 
 	const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
 		console.log('signing up user to firebase with data', data)
+
 	}
 
 	return (
 		<div className="h-screen bg-dark-background flex justify-center items-center">
 			<div className="w-full max-w-xs">
 				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
-					<div className='text-lg text-center font-bold mb-1'>
+					<h2 className='text-lg text-center font-bold mb-1'>
 						Sign up
-					</div>
-					<div className="text-center text-gray-500 text-xs mb-4">
-						<p>Create a new user profile.</p>
-					</div>
+					</h2>
+					<p className="text-center text-gray-500 text-xs mb-4">
+						Create a new user profile.
+					</p>
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="email">
@@ -54,7 +55,10 @@ export const SignUpPage = () => {
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="password">
-							Password
+							Password{' '}
+							<span className="text-center text-gray-500 font-light text-xs mb-4">
+								- at least 8 charachters.
+							</span>
 						</label>
 						<input
 							className={errors.password ? "errorInputStyling" : "defaultInputStyling"}
