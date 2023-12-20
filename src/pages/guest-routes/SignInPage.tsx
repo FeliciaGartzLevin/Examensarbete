@@ -1,17 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { Link } from 'react-router-dom'
-import { Button } from '../../components/Button'
+import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '../../components/generic utilities/Button'
 import { SignInSchema, signInSchema } from '../../schemas/AuthSchemas'
+import { useAuthContext } from '../../hooks/useAuthContext'
+import { useState } from 'react'
+import { Alert } from '../../components/generic utilities/Alert'
+import { useErrorHandler } from '../../hooks/useErrorHandler'
 
 export const SignInPage = () => {
+	const { signin } = useAuthContext()
+	const { errorMsg, resetError, handleError } = useErrorHandler()
+	const navigate = useNavigate()
+	const [loading, setLoading] = useState<boolean>(false)
 	const { handleSubmit, register, formState: { errors } } = useForm<SignInSchema>({
 		resolver: zodResolver(signInSchema)
 	})
 
 	const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
-		console.log('signing in user to firebase with data', data)
+		resetError()
 
+		try {
+			setLoading(true)
+
+			//sin in to firebase user via AuthContext fn
+			await signin(data.email, data.password)
+
+			navigate('/')
+
+		} catch (error) {
+			handleError(error)
+			setLoading(false)
+		}
 	}
 
 	return (
@@ -21,6 +41,10 @@ export const SignInPage = () => {
 					<h2 className='text-lg text-center font-bold mb-1'>
 						Sign in
 					</h2>
+
+					{errorMsg &&
+						<Alert message={errorMsg} color='red' />
+					}
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="email">
@@ -51,10 +75,13 @@ export const SignInPage = () => {
 
 					</div>
 
-					<div className="flex justify-between items-center">
-						<Link to='/forgot-password' className='font-bold  hover:text-link-hover text-green-900'>Forgot password?</Link>
-						<Button type='submit'>Sign in</Button>
-					</div>
+					<div className="flex justify-between items-center gap-2">
+						<Link to='/forgot-password' className='font-bold  hover:text-link-hover text-green-900 text-sm'>Forgot password?</Link>
+						<Button disabled={loading} type='submit'>
+							{loading
+								? 'Signing in... '
+								: 'Sign in'}
+						</Button>					</div>
 				</form>
 				<div className="text-center text-light-background text-xs">
 					<p>Don't have an account?</p>

@@ -1,19 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { Link } from 'react-router-dom'
-import { Button } from '../../components/Button'
+import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '../../components/generic utilities/Button'
 import { SignUpSchema, signUpSchema } from '../../schemas/AuthSchemas'
 import { useAuthContext } from '../../hooks/useAuthContext'
+import { useState } from 'react'
+import { Alert } from '../../components/generic utilities/Alert'
+import { useErrorHandler } from '../../hooks/useErrorHandler'
 
 export const SignUpPage = () => {
+	const { signup } = useAuthContext()
+	const { errorMsg, resetError, handleError } = useErrorHandler()
+	const navigate = useNavigate()
+	const [loading, setLoading] = useState<boolean>(false)
 	const { handleSubmit, register, formState: { errors } } = useForm<SignUpSchema>({
 		resolver: zodResolver(signUpSchema)
 	})
-	const { signup } = useAuthContext()
 
 	const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
-		console.log('signing up user to firebase with data', data)
-		signup(data.email, data.name, data.password)
+		resetError()
+
+		try {
+			setLoading(true)
+
+			//create firebase user via AuthContext fn
+			await signup(data.email, data.name, data.password)
+
+			navigate('/')
+
+		} catch (error) {
+			handleError(error)
+			setLoading(false)
+		}
 	}
 
 	return (
@@ -26,6 +44,10 @@ export const SignUpPage = () => {
 					<p className="text-center text-gray-500 text-xs mb-4">
 						Create a new user profile.
 					</p>
+
+					{errorMsg &&
+						<Alert message={errorMsg} color='red' />
+					}
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="email">
@@ -88,7 +110,11 @@ export const SignUpPage = () => {
 					</div>
 
 					<div className="flex justify-end">
-						<Button type='submit'>Sign up</Button>
+						<Button disabled={loading} type='submit'>
+							{loading
+								? 'Signing up... '
+								: 'Sign up'}
+						</Button>
 					</div>
 				</form>
 				<div className="text-center text-light-background text-xs">

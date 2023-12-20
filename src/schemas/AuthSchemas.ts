@@ -33,13 +33,11 @@ export const signInSchema = z
 	.object({
 		email: z
 			.string()
-			.email({ message: "Email adress must be stated" }),
+			.email({ message: "Email adress must be specified" }),
 
 		password: z
 			.string()
-			.min(8, { message: "Password must be at least 8 characters" })
-			.max(80, { message: "Password can be no longer than 80 characters. Please use a shorter password." }),
-
+			.min(1, { message: "Password must be specified" })
 	})
 
 // extract type from the schema

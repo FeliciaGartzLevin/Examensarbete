@@ -1,9 +1,10 @@
-import { UserCredential, createUserWithEmailAndPassword } from "firebase/auth";
+import { UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { ReactNode, createContext, useState } from "react";
 import { auth } from "../services/firebase";
 
 type AuthContextDef = {
 	signup: (email: string, name: string, password: string) => Promise<UserCredential>
+	signin: (email: string, password: string) => Promise<UserCredential>
 	userName: string | null
 }
 
@@ -16,14 +17,23 @@ type AuthContextProps = {
 export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
 	const [userName, setUserName] = useState<string | null>(null)
 
-	const signup = async (email: string, name: string, password: string) => {
+	const signin = (email: string, password: string) => {
+		console.log('Signing in user in authcontext', email, password)
+		return signInWithEmailAndPassword(auth, email, password)
+	}
+
+	const signup = (email: string, name: string, password: string) => {
 		console.log('Signing up user in authcontext', email, password)
 		setUserName(name)
-		return await createUserWithEmailAndPassword(auth, email, password)
+		return createUserWithEmailAndPassword(auth, email, password)
 	}
 
 	return (
-		<AuthContext.Provider value={{ signup, userName }}>
+		<AuthContext.Provider value={{
+			signup,
+			signin,
+			userName
+		}}>
 			{children}
 		</AuthContext.Provider>
 	)
