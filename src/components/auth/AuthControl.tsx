@@ -1,11 +1,18 @@
 import React, { ReactNode } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuthContext } from '../../hooks/useAuthContext'
 
 type AuthControlProps = {
 	children: ReactNode
+	redirectTo?: string
 }
 
-export const AuthControl: React.FC<AuthControlProps> = ({ children }) => {
+export const AuthControl: React.FC<AuthControlProps> = ({ children, redirectTo = '/' }) => {
+	const { activeUser } = useAuthContext()
+
 	return (
-		<div>AuthControl</div>
+		activeUser
+			? <>{children}</>
+			: <Navigate to={redirectTo} />
 	)
 }

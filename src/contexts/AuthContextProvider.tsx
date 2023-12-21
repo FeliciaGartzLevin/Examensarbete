@@ -1,10 +1,22 @@
-import { UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { ReactNode, createContext, useState } from "react";
+import {
+	UserCredential,
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword,
+	onAuthStateChanged,
+	User,
+	updateProfile,
+	signOut,
+} from "firebase/auth";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth } from "../services/firebase";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type AuthContextDef = {
-	signup: (email: string, name: string, password: string) => Promise<UserCredential>
+	activeUser: User | null
+	setDisplayName: (displayName: string) => Promise<void>
 	signin: (email: string, password: string) => Promise<UserCredential>
+	signout: () => Promise<void>
+	signup: (email: string, password: string) => Promise<UserCredential>
 	userName: string | null
 }
 
@@ -16,25 +28,57 @@ type AuthContextProps = {
 
 export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
 	const [userName, setUserName] = useState<string | null>(null)
+	const [activeUser, setActiveUser] = useState<User | null>(null)
+	const [pending, setPending] = useState(true)
+
+	const setDisplayName = (displayName: string) => {
+		if (!activeUser) {
+			throw new Error("No active user")
+		}
+		return updateProfile(activeUser, { displayName })
+	}
+
+	const signout = () => {
+		return signOut(auth)
+	}
 
 	const signin = (email: string, password: string) => {
-		console.log('Signing in user in authcontext', email, password)
 		return signInWithEmailAndPassword(auth, email, password)
 	}
 
-	const signup = (email: string, name: string, password: string) => {
-		console.log('Signing up user in authcontext', email, password)
-		setUserName(name)
+	const signup = (email: string, password: string) => {
 		return createUserWithEmailAndPassword(auth, email, password)
 	}
 
+
+	useEffect(() => {
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			setActiveUser(user)
+			if (user) {
+				setUserName(user.displayName)
+			} else {
+				setUserName(null)
+			}
+			setPending(false)
+		})
+
+		return unsubscribe
+	}, [])
+
 	return (
 		<AuthContext.Provider value={{
-			signup,
+			activeUser,
+			setDisplayName,
 			signin,
+			signout,
+			signup,
 			userName
 		}}>
-			{children}
+			{pending
+				? <LoadingSpinner />
+				: <>{children}</>
+			}
+
 		</AuthContext.Provider>
 	)
 }

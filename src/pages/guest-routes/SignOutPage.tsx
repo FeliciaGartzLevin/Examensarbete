@@ -11,7 +11,6 @@ export const SignOutPage = () => {
 		const signOutFn = async () => {
 			await signout()
 			navigate('/sign-in')
-			console.log('you were signed out')
 		}
 		signOutFn()
 	}, [signout, navigate])

@@ -7,6 +7,9 @@ import { SignUpPage } from "./pages/guest-routes/SignUpPage"
 import { AboutPage } from "./pages/guest-routes/AboutPage"
 import { SignOutPage } from "./pages/guest-routes/SignOutPage"
 import { LandingPage } from "./pages/auth-routes/LandingPage"
+import { AuthControl } from "./components/auth/AuthControl"
+import { AccountSettingsPage } from "./pages/auth-routes/AccountSettingsPage"
+import { UserPreferencesPage } from "./pages/auth-routes/UserPreferencesPage"
 
 export const App = () => {
 	return (
@@ -26,7 +29,21 @@ export const App = () => {
 					<Route path="/about" element={<AboutPage />} />
 
 					{/* Authenticated Routes - wrappa i förälder som kollar auth  */}
-					<Route path="/" element={<LandingPage />} />
+					<Route path="/" element={
+						<AuthControl>
+							<LandingPage />
+						</AuthControl>
+					} />
+					<Route path="/settings" element={
+						<AuthControl>
+							<AccountSettingsPage />
+						</AuthControl>
+					} />
+					<Route path="/preferences" element={
+						<AuthControl>
+							<UserPreferencesPage />
+						</AuthControl>
+					} />
 
 				</Routes>
 			</div>

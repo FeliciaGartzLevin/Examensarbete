@@ -1,9 +1,11 @@
+import { useAuthContext } from "../../hooks/useAuthContext"
 
 export const LandingPage = () => {
+	const { activeUser, userName } = useAuthContext()
+
 	return (
 		<div>
-			LandingPage
-			Här ska översikten över nuvarande vecka vara
+			Hello {userName}, {activeUser?.email}
 		</div>
 	)
 }
