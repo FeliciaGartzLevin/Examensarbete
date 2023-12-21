@@ -35,7 +35,7 @@ export const SignInPage = () => {
 	}
 
 	return (
-		<div className="h-screen bg-dark-background flex justify-center items-center">
+		<div className="h-full bg-dark-background flex justify-center items-center">
 			<div className="w-full max-w-xs">
 				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
 					<h2 className='text-lg text-center font-bold mb-1'>
@@ -43,7 +43,7 @@ export const SignInPage = () => {
 					</h2>
 
 					{errorMsg &&
-						<Alert message={errorMsg} color='red' />
+						<Alert body={errorMsg} color='red' />
 					}
 
 					<div className="mb-4">

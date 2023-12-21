@@ -24,9 +24,9 @@ export const SignUpPage = () => {
 			setLoading(true)
 
 			//create firebase user via AuthContext fn
-			await signup(data.email, data.name, data.password)
+			await signup(data.email, data.password)
 
-			navigate('/')
+			navigate('/') // --> denna ska senare leda till user preference questions, innan den leder till landing page
 
 		} catch (error) {
 			handleError(error)
@@ -35,7 +35,7 @@ export const SignUpPage = () => {
 	}
 
 	return (
-		<div className="h-screen bg-dark-background flex justify-center items-center">
+		<div className="h-full bg-dark-background flex justify-center items-center">
 			<div className="w-full max-w-xs">
 				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
 					<h2 className='text-lg text-center font-bold mb-1'>
@@ -46,7 +46,7 @@ export const SignUpPage = () => {
 					</p>
 
 					{errorMsg &&
-						<Alert message={errorMsg} color='red' />
+						<Alert body={errorMsg} color='red' />
 					}
 
 					<div className="mb-4">
