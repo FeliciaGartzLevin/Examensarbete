@@ -7,7 +7,7 @@ type AuthControlProps = {
 	redirectTo?: string
 }
 
-export const AuthControl: React.FC<AuthControlProps> = ({ children, redirectTo = '/' }) => {
+export const AuthControl: React.FC<AuthControlProps> = ({ children, redirectTo = '/sign-in' }) => {
 	const { activeUser } = useAuthContext()
 
 	return (

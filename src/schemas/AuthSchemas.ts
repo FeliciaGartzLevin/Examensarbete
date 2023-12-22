@@ -42,3 +42,14 @@ export const signInSchema = z
 
 // extract type from the schema
 export type SignInSchema = z.infer<typeof signInSchema>
+
+
+export const resetPasswordSchema = z
+	.object({
+		email: z
+			.string()
+			.email({ message: "Email adress must be specified" }),
+	})
+
+// extract type from the schema
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>
