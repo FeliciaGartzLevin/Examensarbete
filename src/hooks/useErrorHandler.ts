@@ -21,8 +21,9 @@ export const useErrorHandler = () => {
 			} else if (error.code === 'auth/too-many-requests') {
 				setErrorMsg('Too many requests. Wait a moment and try again.')
 
-			}
-			else {
+			} else if (error.code === 'auth/requires-recent-login') {
+				setErrorMsg('You must sign in again in order to update your settings.')
+			} else {
 				setErrorMsg(error.code)
 			}
 

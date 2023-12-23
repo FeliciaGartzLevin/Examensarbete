@@ -18,4 +18,16 @@
 	.errorMsgStyling {
 		@apply text-xs text-alert-red italic
 	}
+
+	.borderDivider {
+		@apply p-2 sm:first-of-type:border-b-0 sm:first-of-type:border-r-2 first-of-type:border-b-2 border-black
+	}
+
+	.active {
+		@apply font-semibold
+	}
+
+	.h2 {
+		@apply text-lg text-center font-bold
+	}
 }

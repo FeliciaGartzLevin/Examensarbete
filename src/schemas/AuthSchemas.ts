@@ -6,10 +6,10 @@ export const signUpSchema = z
 			.string()
 			.email({ message: "A valid email adress must be specified" }),
 
-		name: z
-			.string()
-			.min(2, { message: "Name must be at least 2 characters" })
-			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
+		// name: z
+		// 	.string()
+		// 	.min(2, { message: "Name must be at least 2 characters" })
+		// 	.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
 
 		password: z
 			.string()
@@ -53,3 +53,30 @@ export const resetPasswordSchema = z
 
 // extract type from the schema
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>
+
+
+export const editAccountSchema = z
+	.object({
+		email: z
+			.string()
+			.email({ message: "A valid email adress must be specified" }),
+
+		name: z
+			.string()
+			.min(2, { message: "Name must be at least 2 characters" })
+			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
+
+		password: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters" })
+			.max(80, { message: "Password can be no longer than 80 characters. Please use a shorter password." }),
+
+		confirmPassword: z
+			.string()
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords must match",
+		path: ["confirmPassword"], // path of error
+	});
+
+export type EditAccountSchema = z.infer<typeof editAccountSchema>

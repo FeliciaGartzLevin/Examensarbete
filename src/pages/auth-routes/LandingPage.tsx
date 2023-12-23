@@ -4,7 +4,7 @@ export const LandingPage = () => {
 	const { activeUser, userName } = useAuthContext()
 
 	return (
-		<div>
+		<div className="h-full">
 			Hello {userName}, {activeUser?.email}
 		</div>
 	)

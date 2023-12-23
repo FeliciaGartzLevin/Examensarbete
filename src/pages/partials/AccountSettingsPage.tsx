@@ -1,32 +1,45 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../../components/generic utilities/Button'
-import { SignUpSchema, signUpSchema } from '../../schemas/AuthSchemas'
+import { EditAccountSchema, editAccountSchema } from '../../schemas/AuthSchemas'
 import { useAuthContext } from '../../hooks/useAuthContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert } from '../../components/generic utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
+import { Link } from 'react-router-dom'
 
-export const SignUpPage = () => {
-	const { signup } = useAuthContext()
+
+export const AccountSettingsPage = () => {
+	const { activeUser, setEmail, setDisplayName, setPassword, updateUser } = useAuthContext()
 	const { errorMsg, resetError, handleError } = useErrorHandler()
-	const navigate = useNavigate()
+	const [confirmationMsg, setConfirmationMsg] = useState<string | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
-	const { handleSubmit, register, formState: { errors } } = useForm<SignUpSchema>({
-		resolver: zodResolver(signUpSchema)
+	const { handleSubmit, register, reset, formState: { isSubmitSuccessful, errors } } = useForm<EditAccountSchema>({
+		defaultValues: {
+			email: activeUser?.email ?? '',
+			name: activeUser?.displayName ?? '',
+		},
+		resolver: zodResolver(editAccountSchema)
 	})
 
-	const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
+	const onSubmit: SubmitHandler<EditAccountSchema> = async (data) => {
 		resetError()
 
 		try {
 			setLoading(true)
 
-			//create firebase user via AuthContext fn
-			await signup(data.email, data.password)
+			if (data.email !== (activeUser?.email ?? '')) {
+				await setEmail(data.email)
+			}
+			if (data.name !== (activeUser?.displayName ?? '')) {
+				await setDisplayName(data.name)
+			}
 
-			navigate('/') // --> denna ska senare leda till user preference questions, innan den leder till landing page
+			await setPassword(data.password)
+
+			setConfirmationMsg('Changes saved')
+			updateUser()
+			setLoading(false)
 
 		} catch (error) {
 			handleError(error)
@@ -34,20 +47,35 @@ export const SignUpPage = () => {
 		}
 	}
 
+	// emptying form if isSubmitSuccessful
+	useEffect(() => {
+		if (isSubmitSuccessful) {
+			reset({
+				password: "",
+				confirmPassword: "",
+			})
+		}
+	}, [isSubmitSuccessful, reset])
+
 	return (
-		<div className="h-full bg-dark-background flex justify-center items-center">
+		<div className="flex flex-col gap-4">
 			<div className="w-full max-w-xs">
-				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
-					<h2 className='text-lg text-center font-bold mb-1'>
-						Sign up
-					</h2>
-					<p className="text-center text-gray-500 text-xs mb-4">
-						Create a new user profile.
-					</p>
+				<form onSubmit={handleSubmit(onSubmit)} className="">
+					<div className='flex flex-col mb-4'>
+						<h3 className='text-lg text-center font-bold'>
+							Account settings
+						</h3>
+						<p className="text-center text-gray-500 text-xs mb-4">
+							Edit your information here if desired.<br />
+							You must first <Link className='font-bold hover:text-link-hover' to="/sign-out">sign in</Link>
+							{' '}in again if you haven't done it recently, in order to update your settings.
+						</p>
+					</div>
 
 					{errorMsg &&
 						<Alert body={errorMsg} color='red' />
 					}
+					{confirmationMsg && <Alert body={confirmationMsg} color='green' />}
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="email">
@@ -63,7 +91,7 @@ export const SignUpPage = () => {
 						{errors.email && <p className="errorMsgStyling">{errors.email.message ?? "Invalid value"}</p>}
 					</div>
 
-					{/* <div className="mb-4">
+					<div className="mb-4">
 						<label className="labelStyling" aria-label="name">
 							Name
 						</label>
@@ -75,7 +103,7 @@ export const SignUpPage = () => {
 							{...register('name')}
 						/>
 						{errors.name && <p className="errorMsgStyling">{errors.name.message ?? "Invalid value"}</p>}
-					</div> */}
+					</div>
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="password">
@@ -112,18 +140,14 @@ export const SignUpPage = () => {
 					<div className="flex justify-end">
 						<Button disabled={loading} type='submit'>
 							{loading
-								? 'Signing up... '
-								: 'Sign up'}
+								? 'Submitting...'
+								: 'Submit'}
 						</Button>
 					</div>
 				</form>
-				<div className="text-center text-light-background text-xs">
-					<p>Do you already have an account?</p>
-					<p>
-						Go to <Link className='font-bold hover:text-link-hover' to='/sign-in'>sign in</Link>.
-					</p>
-				</div>
-			</div>
-		</div>
+
+			</div >
+		</div >
 	)
 }
+

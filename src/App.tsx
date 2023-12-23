@@ -41,11 +41,11 @@ export const App = () => {
 							<SettingsPage />
 						</AuthControl>
 					} >
-						<Route index element={
+						{/* <Route index element={
 							<AuthControl>
 								<UserPreferencesPage />
 							</AuthControl>
-						} />
+						} /> */}
 						<Route path="/settings/account-settings" element={
 							<AuthControl>
 								<AccountSettingsPage />
