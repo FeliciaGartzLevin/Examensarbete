@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom"
-import { UserImgAndName } from "../../components/UserImgAndName"
+import { UserImgAndName } from "../../../components/UserImgAndName"
 
 export const SettingsPage = () => {
 	return (
