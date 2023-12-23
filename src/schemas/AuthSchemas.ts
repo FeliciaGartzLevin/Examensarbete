@@ -6,10 +6,10 @@ export const signUpSchema = z
 			.string()
 			.email({ message: "A valid email adress must be specified" }),
 
-		// name: z
-		// 	.string()
-		// 	.min(2, { message: "Name must be at least 2 characters" })
-		// 	.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
+		name: z
+			.string()
+			.min(2, { message: "Name must be at least 2 characters" })
+			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
 
 		password: z
 			.string()

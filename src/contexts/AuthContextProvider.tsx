@@ -11,8 +11,9 @@ import {
 	updatePassword,
 } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
-import { auth } from "../services/firebase";
+import { auth, usersCol } from "../services/firebase";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 type AuthContextDef = {
 	activeUser: User | null
@@ -22,8 +23,8 @@ type AuthContextDef = {
 	setPassword: (password: string) => Promise<void>
 	signin: (email: string, password: string) => Promise<UserCredential>
 	signout: () => Promise<void>
-	signup: (email: string, password: string) => Promise<UserCredential>
-	updateUser: () => false | undefined
+	signup: (email: string, name: string, password: string) => Promise<UserCredential>
+	updateUserLocally: () => false | undefined
 	userName: string | null
 }
 
@@ -35,7 +36,6 @@ type AuthContextProps = {
 
 export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
 	const [userName, setUserName] = useState<string | null>(null)
-	const [userEmail, setUserEmail] = useState<string | null>(null)
 	const [activeUser, setActiveUser] = useState<User | null>(null)
 	const [pending, setPending] = useState(true)
 
@@ -74,16 +74,32 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 		return signInWithEmailAndPassword(auth, email, password)
 	}
 
-	const signup = (email: string, password: string) => {
-		return createUserWithEmailAndPassword(auth, email, password)
+	const signup = async (email: string, name: string, password: string) => {
+		const userCredentials = await createUserWithEmailAndPassword(auth, email, password)
+		const newUser = userCredentials.user
+
+		updateProfile(newUser, {
+			displayName: name,
+		})
+
+		setUserName(name)
+
+		const docRef = doc(usersCol, newUser.uid)
+		setDoc(docRef, {
+			createdAt: serverTimestamp(),
+			email,
+			displayName: name,
+			createdMealIds: null,
+			uid: newUser.uid,
+			updatedAt: serverTimestamp()
+		})
+
+		return userCredentials
 	}
 
-	const updateUser = () => {
+	const updateUserLocally = () => {
 		if (!auth.currentUser) { return false }
 		setUserName(auth.currentUser.displayName)
-
-		if (!auth.currentUser.email) { return false }
-		setUserEmail(auth.currentUser.email)
 	}
 
 	useEffect(() => {
@@ -110,7 +126,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 			signin,
 			signout,
 			signup,
-			updateUser,
+			updateUserLocally,
 			userName
 		}}>
 			{pending

@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 
 
 export const AccountSettingsPage = () => {
-	const { activeUser, setEmail, setDisplayName, setPassword, updateUser } = useAuthContext()
+	const { activeUser, setEmail, setDisplayName, setPassword, updateUserLocally } = useAuthContext()
 	const { errorMsg, resetError, handleError } = useErrorHandler()
 	const [confirmationMsg, setConfirmationMsg] = useState<string | null>(null)
 	const [loading, setLoading] = useState<boolean>(false)
@@ -38,7 +38,8 @@ export const AccountSettingsPage = () => {
 			await setPassword(data.password)
 
 			setConfirmationMsg('Changes saved')
-			updateUser()
+			updateUserLocally()
+
 			setLoading(false)
 
 		} catch (error) {

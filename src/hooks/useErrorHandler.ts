@@ -13,7 +13,7 @@ export const useErrorHandler = () => {
 		if (error instanceof FirebaseError) {
 			//handling different types of Firebase error codes
 			if (error.code === 'auth/email-already-in-use') {
-				setErrorMsg("Email is already in use. Go to 'sign in' or choose another email.")
+				setErrorMsg("This email is already in use. Go to 'sign in' or choose another email.")
 
 			} else if (error.code === 'auth/invalid-credential') {
 				setErrorMsg('Wrong email or password')

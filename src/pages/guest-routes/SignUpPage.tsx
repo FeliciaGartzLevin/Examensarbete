@@ -24,7 +24,7 @@ export const SignUpPage = () => {
 			setLoading(true)
 
 			//create firebase user via AuthContext fn
-			await signup(data.email, data.password)
+			await signup(data.email, data.name, data.password)
 
 			navigate('/') // --> denna ska senare leda till user preference questions, innan den leder till landing page
 
@@ -63,7 +63,7 @@ export const SignUpPage = () => {
 						{errors.email && <p className="errorMsgStyling">{errors.email.message ?? "Invalid value"}</p>}
 					</div>
 
-					{/* <div className="mb-4">
+					<div className="mb-4">
 						<label className="labelStyling" aria-label="name">
 							Name
 						</label>
@@ -75,7 +75,7 @@ export const SignUpPage = () => {
 							{...register('name')}
 						/>
 						{errors.name && <p className="errorMsgStyling">{errors.name.message ?? "Invalid value"}</p>}
-					</div> */}
+					</div>
 
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="password">
