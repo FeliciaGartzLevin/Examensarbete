@@ -10,7 +10,7 @@ export const SettingsPage = () => {
 
 					<UserImgAndName />
 
-					<div className="flex justify-center items-center gap-2 flex-col sm:flex-row">
+					<div className="flex justify-center items-center gap-2 flex-row">
 						<p className="borderDivider"><NavLink to='/settings/preferences'>User Preferences</NavLink></p>
 						<p><NavLink to='/settings/account-settings'>Account settings</NavLink></p>
 					</div>

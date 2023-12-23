@@ -20,7 +20,7 @@
 	}
 
 	.borderDivider {
-		@apply p-2 sm:first-of-type:border-b-0 sm:first-of-type:border-r-2 first-of-type:border-b-2 border-black
+		@apply p-2 first-of-type:border-r-2 border-black
 	}
 
 	.active {
