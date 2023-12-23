@@ -15,8 +15,9 @@ import { auth, usersCol } from "../services/firebase";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
-type AuthContextDef = {
+type AuthContextType = {
 	activeUser: User | null
+	activeUserId: string | null
 	resetPassword: (email: string) => Promise<void>
 	setEmail: (email: string) => Promise<void>
 	setDisplayName: (displayName: string) => Promise<void>
@@ -28,7 +29,7 @@ type AuthContextDef = {
 	userName: string | null
 }
 
-export const AuthContext = createContext<AuthContextDef | null>(null)
+export const AuthContext = createContext<AuthContextType | null>(null)
 
 type AuthContextProps = {
 	children: ReactNode
@@ -37,6 +38,7 @@ type AuthContextProps = {
 export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
 	const [userName, setUserName] = useState<string | null>(null)
 	const [activeUser, setActiveUser] = useState<User | null>(null)
+	const [activeUserId, setActiveUserId] = useState<string | null>(null)
 	const [pending, setPending] = useState(true)
 
 	const resetPassword = (email: string) => {
@@ -86,11 +88,16 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 
 		const docRef = doc(usersCol, newUser.uid)
 		setDoc(docRef, {
-			createdAt: serverTimestamp(),
+			uid: newUser.uid,
 			email,
 			displayName: name,
 			createdMealIds: null,
-			uid: newUser.uid,
+			preferences: {
+				mealsPerDay: 1,
+				foodPreferences: null,
+				generateFrom: 'allDishes'
+			},
+			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp()
 		})
 
@@ -100,6 +107,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 	const updateUserLocally = () => {
 		if (!auth.currentUser) { return false }
 		setUserName(auth.currentUser.displayName)
+		setActiveUserId(auth.currentUser.uid)
 	}
 
 	useEffect(() => {
@@ -107,8 +115,10 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 			setActiveUser(user)
 			if (user) {
 				setUserName(user.displayName)
+				setActiveUserId(user.uid)
 			} else {
 				setUserName(null)
+				setActiveUserId(null)
 			}
 			setPending(false)
 		})
@@ -119,6 +129,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 	return (
 		<AuthContext.Provider value={{
 			activeUser,
+			activeUserId,
 			resetPassword,
 			setEmail,
 			setDisplayName,

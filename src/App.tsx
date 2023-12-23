@@ -8,9 +8,11 @@ import { AboutPage } from "./pages/guest-routes/AboutPage"
 import { SignOutPage } from "./pages/guest-routes/SignOutPage"
 import { LandingPage } from "./pages/auth-routes/LandingPage"
 import { AuthControl } from "./components/auth/AuthControl"
-import { SettingsPage } from "./pages/auth-routes/SettingsPage"
-import { AccountSettingsPage } from "./pages/partials/AccountSettingsPage"
-import { UserPreferencesPage } from "./pages/partials/UserPreferencesPage"
+import { SettingsPage } from "./pages/auth-routes/settings/SettingsPage"
+import { AccountSettingsPage } from "./pages/auth-routes/settings/AccountSettingsPage"
+import { UserPreferencesPage } from "./pages/auth-routes/settings/UserPreferencesPage"
+import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
+import { MealsPerDay } from "./pages/auth-routes/questions/MealsPerDay"
 
 export const App = () => {
 	return (
@@ -54,6 +56,18 @@ export const App = () => {
 						<Route path="/settings/preferences" element={
 							<AuthControl>
 								<UserPreferencesPage />
+							</AuthControl>
+						} />
+					</Route>
+
+					<Route path="/questions" element={
+						<AuthControl>
+							<QuestionsPage />
+						</AuthControl>
+					} >
+						<Route path="/questions/meals" element={
+							<AuthControl>
+								<MealsPerDay />
 							</AuthControl>
 						} />
 					</Route>

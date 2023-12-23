@@ -6,12 +6,13 @@ export type UserDoc = {
 	email: string,
 	displayName: string
 	createdMealIds: string[] | null
+	preferences: UserPreferences
 	createdAt: Timestamp
 	updatedAt: Timestamp
 }
 
 export type UserPreferences = {
 	mealsPerDay: 1 | 2,
-	foodPreferences: Preferences[],
+	foodPreferences: Preferences[] | null,
 	generateFrom: 'ownDishes' | 'allDishes',
 }

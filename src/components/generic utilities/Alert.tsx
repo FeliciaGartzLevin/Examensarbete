@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 type AlertProps = {
-	header?: string
-	body?: string
+	header?: string | ReactNode
+	body?: string | ReactNode
 	className?: string
 	color: 'red' | 'green' | 'orange' | 'blackandwhite' | 'none'
 }
