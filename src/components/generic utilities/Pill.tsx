@@ -5,12 +5,14 @@ type PillProps = {
 	py?: 'py-1' | 'py-2' // padding y
 	isActive: boolean
 	onClick: () => void
+	disabled?: boolean
 }
 
-export const Pill: React.FC<PillProps> = ({ children, onClick, py = 'py-2', isActive }) => {
+export const Pill: React.FC<PillProps> = ({ children, onClick, py = 'py-2', isActive, disabled = false }) => {
 
 	return (
 		<button
+			disabled={disabled}
 			type='button'
 			onClick={onClick}
 			className={'px-3 min-w-[2.5rem] border-black rounded-xl ' + py + (isActive ? ' border-2 bg-gray-300' : ' border')}

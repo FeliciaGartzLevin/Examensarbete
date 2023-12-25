@@ -3,9 +3,14 @@ import { FirebaseError } from 'firebase/app';
 
 export const useErrorHandler = () => {
 	const [errorMsg, setErrorMsg] = useState<string | null>(null)
+	const [loading, setLoading] = useState<boolean>(false)
 
 	const resetError = () => {
 		setErrorMsg(null)
+	}
+
+	const setLoadingStatus = (status: boolean) => {
+		setLoading(status)
 	}
 
 	const handleError = (error: unknown) => {
@@ -36,6 +41,8 @@ export const useErrorHandler = () => {
 	return {
 		errorMsg,
 		handleError,
-		resetError
+		resetError,
+		loading,
+		setLoadingStatus
 	}
 }

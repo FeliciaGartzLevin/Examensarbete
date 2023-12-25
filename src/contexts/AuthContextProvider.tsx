@@ -13,7 +13,8 @@ import {
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth, usersCol } from "../services/firebase";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { UserPreferences } from "../types/User.types";
 
 type AuthContextType = {
 	activeUser: User | null
@@ -26,6 +27,7 @@ type AuthContextType = {
 	signout: () => Promise<void>
 	signup: (email: string, name: string, password: string) => Promise<UserCredential>
 	updateUserLocally: () => false | undefined
+	updateUserPreferences: (choice: UserPreferences[keyof UserPreferences], preference: keyof UserPreferences) => Promise<void>
 	userName: string | null
 }
 
@@ -48,23 +50,17 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 	}
 
 	const setEmail = (email: string) => {
-		if (!activeUser) {
-			throw new Error("No active user")
-		}
+		if (!activeUser) { throw new Error("No active user") }
 		return updateEmail(activeUser, email)
 	}
 
 	const setDisplayName = (displayName: string) => {
-		if (!activeUser) {
-			throw new Error("No active user")
-		}
+		if (!activeUser) { throw new Error("No active user") }
 		return updateProfile(activeUser, { displayName })
 	}
 
 	const setPassword = (password: string) => {
-		if (!activeUser) {
-			throw new Error("No active user")
-		}
+		if (!activeUser) { throw new Error("No active user") }
 		return updatePassword(activeUser, password)
 	}
 
@@ -104,6 +100,17 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 		return userCredentials
 	}
 
+	const updateUserPreferences = (choice: UserPreferences[keyof UserPreferences], preference: keyof UserPreferences) => {
+		if (!activeUser) { throw new Error("No active user") }
+
+		const docRef = doc(usersCol, activeUser.uid)
+		return updateDoc(docRef, {
+			preferences: {
+				[preference]: choice,
+			}
+		})
+	}
+
 	const updateUserLocally = () => {
 		if (!auth.currentUser) { return false }
 		setUserName(auth.currentUser.displayName)
@@ -138,6 +145,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 			signout,
 			signup,
 			updateUserLocally,
+			updateUserPreferences,
 			userName
 		}}>
 			{pending
