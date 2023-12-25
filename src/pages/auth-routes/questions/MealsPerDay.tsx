@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Pill } from "../../../components/generic utilities/Pill"
-import { useAuthContext } from "../../../hooks/useAuthContext";
 import { UserPreferences } from "../../../types/User.types";
 import { Alert } from "../../../components/generic utilities/Alert";
 import { useErrorHandler } from "../../../hooks/useErrorHandler";
+import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
 
 export const MealsPerDay = () => {
-	const { updateUserPreferences } = useAuthContext()
+	const { updateUserPreferences } = useFirebaseUpdates()
 	const [selectedOption, setSelectedOption] = useState<number | null>(null);
 	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
 	const choices = [1, 2]
@@ -23,7 +23,7 @@ export const MealsPerDay = () => {
 
 			//navigate to next question
 
-			console.log('update in db suceeded')
+			console.log('update in db succeeded')
 
 		} catch (error) {
 			handleError(error)
