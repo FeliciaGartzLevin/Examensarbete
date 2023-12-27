@@ -15,8 +15,8 @@ export const useErrorHandler = () => {
 
 	const handleError = (error: unknown) => {
 
+		//handling different types of Firebase error codes
 		if (error instanceof FirebaseError) {
-			//handling different types of Firebase error codes
 			if (error.code === 'auth/email-already-in-use') {
 				setErrorMsg("This email is already in use. Go to 'sign in' or choose another email.")
 
@@ -28,11 +28,13 @@ export const useErrorHandler = () => {
 
 			} else if (error.code === 'auth/requires-recent-login') {
 				setErrorMsg('You must sign in again in order to update your settings.')
+
 			} else {
 				setErrorMsg(error.code)
 			}
 
 		} else {
+			//handling all other errors
 			setErrorMsg('An unknown error occurred. Please try again.')
 		}
 

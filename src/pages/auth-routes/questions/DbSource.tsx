@@ -4,13 +4,13 @@ import { UserPreferences } from "../../../types/User.types";
 import { Alert } from "../../../components/generic utilities/Alert";
 import { useErrorHandler } from "../../../hooks/useErrorHandler";
 import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
-export const MealsPerDay = () => {
+export const DbSource = () => {
 	const { updateUserPreferences } = useFirebaseUpdates()
 	const [selectedOption, setSelectedOption] = useState<number | null>(null);
 	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
-	const navigate = useNavigate()
+	// const navigate = useNavigate()
 	const choices = [1, 2]
 
 	const handleChoice = async (choice: UserPreferences['mealsPerDay']) => {
@@ -21,19 +21,19 @@ export const MealsPerDay = () => {
 			setLoadingStatus(true)
 
 			// logic for updating preferences in the db
-			await updateUserPreferences(choice, 'mealsPerDay')
+			await updateUserPreferences(choice, 'generateFrom')
 
-			//navigate to next question after 2 secs
-			setTimeout(() => { navigate('/questions/food-preferences') }, 500)
+			//navigate to next question
+			// navigate('/')
 
 			console.log('update in db succeeded')
 
 		} catch (error) {
 			handleError(error)
-
-		} finally {
 			setLoadingStatus(false)
+
 		}
+		setLoadingStatus(false)
 	}
 
 	return (

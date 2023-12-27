@@ -1,6 +1,6 @@
-export type Category = Preferences & 'Fish' | 'Chicken' | 'Potatoes' | 'Weekend' | 'Holidays'
+export type Category = Preference & 'Fish' | 'Chicken' | 'Potatoes' | 'Pasta' | 'Weekend' | 'Holidays'
 
-export type Preferences = 'Omnivore' | 'Vegetarian' | 'Vegan' | 'Glutenfree'
+export type Preference = 'Vegetarian' | 'Vegan' | 'Glutenfree' | 'Lactose-free'
 
 export type Meal = {
 	_id: string

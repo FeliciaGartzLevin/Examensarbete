@@ -26,7 +26,7 @@ export const SignUpPage = () => {
 			//create firebase user via AuthContext fn
 			await signup(data.email, data.name, data.password)
 
-			navigate('/') // --> denna ska senare leda till user preference questions, innan den leder till landing page
+			navigate('/questions/meals')
 
 		} catch (error) {
 			handleError(error)

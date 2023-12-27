@@ -88,7 +88,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) =>
 			createdMealIds: null,
 			preferences: {
 				mealsPerDay: 1,
-				foodPreferences: null,
+				foodPreferences: [],
 				generateFrom: 'allDishes'
 			},
 			createdAt: serverTimestamp(),

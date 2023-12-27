@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import { Preferences } from "./Meal.types";
+import { Preference } from "./Meal.types";
 
 export type UserDoc = {
 	uid: string
@@ -13,6 +13,6 @@ export type UserDoc = {
 
 export type UserPreferences = {
 	mealsPerDay: 1 | 2,
-	foodPreferences: Preferences[] | null,
+	foodPreferences: Preference[],
 	generateFrom: 'ownDishes' | 'allDishes',
 }
