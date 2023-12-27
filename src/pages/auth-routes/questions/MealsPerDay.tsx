@@ -6,7 +6,7 @@ import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
 import { QuestionsProps } from "./QuestionsPage";
 import { extractPreferences } from "../../../helpers/questionHelpers";
 
-export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId, pagination }) => {
 	const {
 		updateFirebaseDb,
 		errorMsg,
@@ -46,7 +46,7 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 				<Alert body={errorMsg} color='red' />
 			}
 
-			<div className="flex justify-center gap-6">
+			<div className="flex justify-center gap-6 mb-4">
 				{choices.map((choice) => (
 					<Pill
 						disabled={loading}
@@ -58,6 +58,11 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 					</Pill>
 				))}
 			</div>
+			{pagination &&
+				<div className="flex justify-center">
+					{pagination}
+				</div>
+			}
 		</div>
 	)
 }

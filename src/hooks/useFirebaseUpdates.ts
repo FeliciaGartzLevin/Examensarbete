@@ -33,7 +33,6 @@ export const useFirebaseUpdates = () => {
 
 			console.log('user preferences ws updated in the db');
 
-
 		} catch (error) {
 			handleError(error)
 

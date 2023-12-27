@@ -7,7 +7,7 @@ import { QuestionsProps } from "./QuestionsPage";
 import { extractPreferences } from "../../../helpers/questionHelpers";
 import { UserPreferences } from "../../../types/User.types";
 
-export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId, pagination }) => {
 	const {
 		updateFirebaseDb,
 		errorMsg,
@@ -58,7 +58,7 @@ export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading,
 				<Alert body={errorMsg} color='red' />
 			}
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
 				{foodPrefs.map((foodPref) => (
 					<Pill
 						className="text-sm"
@@ -71,6 +71,11 @@ export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading,
 					</Pill>
 				))}
 			</div>
+			{pagination &&
+				<div className="flex justify-center">
+					{pagination}
+				</div>
+			}
 		</div>
 	)
 }

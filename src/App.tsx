@@ -42,11 +42,6 @@ export const App = () => {
 							<SettingsPage />
 						</AuthControl>
 					} >
-						{/* <Route index element={
-							<AuthControl>
-								<UserPreferencesPage />
-							</AuthControl>
-						} /> */}
 						<Route path="/settings/account-settings" element={
 							<AuthControl>
 								<AccountSettingsPage />
@@ -59,7 +54,7 @@ export const App = () => {
 						} />
 					</Route>
 
-					<Route path="/questions" element={
+					<Route path="/questions/*" element={
 						<AuthControl>
 							<QuestionsPage />
 						</AuthControl>

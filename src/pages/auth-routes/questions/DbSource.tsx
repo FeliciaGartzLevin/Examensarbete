@@ -6,7 +6,7 @@ import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
 import { QuestionsProps } from "./QuestionsPage";
 import { extractPreferences } from "../../../helpers/questionHelpers";
 
-export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId, pagination }) => {
 	const {
 		updateFirebaseDb,
 		errorMsg,
@@ -46,7 +46,7 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 				<Alert body={errorMsg} color='red' />
 			}
 
-			<div className="flex flex-col justify-center gap-6 sm:flex-row">
+			<div className="flex flex-col justify-center gap-6 sm:flex-row mb-4">
 				{choices.map((choice) => (
 					<Pill
 						disabled={loading}
@@ -58,6 +58,13 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 					</Pill>
 				))}
 			</div>
+
+			{pagination &&
+				<div className="flex justify-center">
+					{pagination}
+				</div>
+			}
+
 		</div>
 	)
 }
