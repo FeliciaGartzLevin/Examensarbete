@@ -12,9 +12,6 @@ import { SettingsPage } from "./pages/auth-routes/settings/SettingsPage"
 import { AccountSettingsPage } from "./pages/auth-routes/settings/AccountSettingsPage"
 import { UserPreferencesPage } from "./pages/auth-routes/settings/UserPreferencesPage"
 import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
-import { MealsPerDay } from "./pages/auth-routes/questions/MealsPerDay"
-import { DbSource } from "./pages/auth-routes/questions/DbSource"
-import { FoodPreferences } from "./pages/auth-routes/questions/FoodPreferences"
 
 export const App = () => {
 	return (
@@ -66,23 +63,7 @@ export const App = () => {
 						<AuthControl>
 							<QuestionsPage />
 						</AuthControl>
-					} >
-						<Route path="/questions/meals" element={
-							<AuthControl>
-								<MealsPerDay />
-							</AuthControl>
-						} />
-						<Route path="/questions/food-preferences" element={
-							<AuthControl>
-								<FoodPreferences />
-							</AuthControl>
-						} />
-						<Route path="/questions/db-source" element={
-							<AuthControl>
-								<DbSource />
-							</AuthControl>
-						} />
-					</Route>
+					} />
 
 				</Routes>
 			</div>

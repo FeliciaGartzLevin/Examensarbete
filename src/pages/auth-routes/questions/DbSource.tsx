@@ -1,58 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pill } from "../../../components/generic utilities/Pill"
 import { UserPreferences } from "../../../types/User.types";
 import { Alert } from "../../../components/generic utilities/Alert";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
 import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
-// import { useNavigate } from "react-router-dom";
+import { QuestionsProps } from "./QuestionsPage";
+import { extractPreferences } from "../../../helpers/questionHelpers";
 
-export const DbSource = () => {
-	const { updateUserPreferences } = useFirebaseUpdates()
-	const [selectedOption, setSelectedOption] = useState<number | null>(null);
-	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
-	// const navigate = useNavigate()
-	const choices = [1, 2]
+export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+	const {
+		updateFirebaseDb,
+		errorMsg,
+		loading,
+	} = useFirebaseUpdates()
+	const [selectedOption, setSelectedOption] = useState<UserPreferences['generateFrom'] | null>(null);
+	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
+	const choices = [
+		{ text: 'All dishes', value: 'allDishes' },
+		{ text: 'Only my own', value: 'ownDishes' },
+	]
 
-	const handleChoice = async (choice: UserPreferences['mealsPerDay']) => {
-		resetError()
-		setSelectedOption(choice)
+	useEffect(() => {
+		if (isLoading) { return }
+		if (initialFetchCompleted) { return }
 
-		try {
-			setLoadingStatus(true)
+		const preferences = extractPreferences(userDocs, activeUserId, 'generateFrom')
+		setSelectedOption(preferences as UserPreferences['generateFrom'])
+		setInitialFetchCompleted(true)
 
-			// logic for updating preferences in the db
-			await updateUserPreferences(choice, 'generateFrom')
+		// eslint-disable-next-line
+	}, [initialFetchCompleted, isLoading])
 
-			//navigate to next question
-			// navigate('/')
+	useEffect(() => {
+		if (!initialFetchCompleted) { return }
+		if (!selectedOption) { return }
 
-			console.log('update in db succeeded')
-
-		} catch (error) {
-			handleError(error)
-			setLoadingStatus(false)
-
-		}
-		setLoadingStatus(false)
-	}
+		updateFirebaseDb(selectedOption, 'generateFrom')
+		// eslint-disable-next-line
+	}, [selectedOption])
 
 	return (
 		<div className="flex flex-col gap-4 text-center">
-			<h3 className="">How many meals per day do you wish to see in your mealplan?</h3>
+			<h3 className="">Do you want to generate your weekly mealplan from all dishes in the database or only from your own?</h3>
 
 			{errorMsg &&
 				<Alert body={errorMsg} color='red' />
 			}
 
-			<div className="flex justify-center gap-6">
+			<div className="flex flex-col justify-center gap-6 sm:flex-row">
 				{choices.map((choice) => (
 					<Pill
 						disabled={loading}
-						key={choice}
-						onClick={() => handleChoice(choice as UserPreferences['mealsPerDay'])}
-						isActive={selectedOption === choice}
+						key={choice.value}
+						onClick={() => setSelectedOption(choice.value as UserPreferences['generateFrom'])}
+						isActive={selectedOption === choice.value}
 					>
-						{choice}
+						{choice.text}
 					</Pill>
 				))}
 			</div>

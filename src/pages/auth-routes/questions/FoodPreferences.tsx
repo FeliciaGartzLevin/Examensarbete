@@ -1,53 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pill } from "../../../components/generic utilities/Pill"
 import { Alert } from "../../../components/generic utilities/Alert";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
 import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
 import { Preference } from "../../../types/Meal.types";
-import { Button } from "../../../components/generic utilities/Button";
-import { Link } from "react-router-dom";
-import { useStreamUserPreferences } from "../../../hooks/useStreamUserPreferences";
-import { useAuthContext } from "../../../hooks/useAuthContext";
+import { QuestionsProps } from "./QuestionsPage";
+import { extractPreferences } from "../../../helpers/questionHelpers";
+import { UserPreferences } from "../../../types/User.types";
 
-export const FoodPreferences = () => {
-	const { activeUser } = useAuthContext()
-	const { updateUserPreferences } = useFirebaseUpdates()
-	const { data: userDocs, isLoading } = useStreamUserPreferences()
-	const [selectedOptions, setSelectedOptions] = useState<Preference[]>(extractPreferences())
+export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+	const {
+		updateFirebaseDb,
+		errorMsg,
+		loading,
+	} = useFirebaseUpdates()
+	const [selectedOptions, setSelectedOptions] = useState<UserPreferences['foodPreferences']>([])
 	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
-	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
 	const foodPrefs = ['Vegetarian', 'Vegan', 'Glutenfree', 'Lactose-free']
-
-	function extractPreferences() {
-		if (!userDocs) { return [] }
-		if (!activeUser) { return [] }
-
-		const userDoc = userDocs.find(doc => doc.uid === activeUser.uid)
-
-		if (!userDoc) { return [] }
-
-		return userDoc.preferences.foodPreferences
-	}
-
-
-	const updateFirebaseDb = useCallback(async () => {
-		resetError()
-
-		try {
-			setLoadingStatus(true)
-
-			// logic for updating preferences in the db
-			await updateUserPreferences(selectedOptions, 'foodPreferences')
-
-		} catch (error) {
-			handleError(error)
-
-		} finally {
-			setLoadingStatus(false)
-		}
-
-		// eslint-disable-next-line
-	}, [selectedOptions])
 
 	const handleChoice = (foodPref: Preference) => {
 
@@ -60,11 +28,12 @@ export const FoodPreferences = () => {
 	}
 
 	useEffect(() => {
+		// if loading fetch of userPreferences in the db or
 		if (isLoading) { return }
 		if (initialFetchCompleted) { return }
 
-		const preferences = extractPreferences()
-		setSelectedOptions(preferences)
+		const preferences = extractPreferences(userDocs, activeUserId, 'foodPreferences')
+		setSelectedOptions(preferences as UserPreferences['foodPreferences'] ?? [])
 		setInitialFetchCompleted(true)
 
 		// eslint-disable-next-line
@@ -73,14 +42,17 @@ export const FoodPreferences = () => {
 	useEffect(() => {
 		if (!initialFetchCompleted) { return }
 
-		updateFirebaseDb()
+		updateFirebaseDb(selectedOptions, 'foodPreferences')
 		// eslint-disable-next-line
-	}, [selectedOptions, updateFirebaseDb])
+	}, [selectedOptions])
 
 
 	return (
 		<div className="flex flex-col gap-4 text-center">
-			<h3 className="">Do you have any special food preferences or allergies?<br /> If not, choose nothing.</h3>
+			<div>
+				<h3 className="mb-2">Do you have any special food preferences or allergies?</h3>
+				<p className="text-xs text-gray-500">If not, choose nothing.</p>
+			</div>
 
 			{errorMsg &&
 				<Alert body={errorMsg} color='red' />
@@ -98,9 +70,6 @@ export const FoodPreferences = () => {
 						{foodPref}
 					</Pill>
 				))}
-			</div>
-			<div>
-				<Link to="/questions/db-source"><Button>Next</Button></Link>
 			</div>
 		</div>
 	)

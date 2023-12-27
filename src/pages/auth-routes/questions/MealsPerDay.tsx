@@ -1,45 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pill } from "../../../components/generic utilities/Pill"
 import { UserPreferences } from "../../../types/User.types";
 import { Alert } from "../../../components/generic utilities/Alert";
-import { useErrorHandler } from "../../../hooks/useErrorHandler";
 import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
-import { useNavigate } from "react-router-dom";
+import { QuestionsProps } from "./QuestionsPage";
+import { extractPreferences } from "../../../helpers/questionHelpers";
 
-export const MealsPerDay = () => {
-	const { updateUserPreferences } = useFirebaseUpdates()
-	const [selectedOption, setSelectedOption] = useState<number | null>(null);
-	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
-	const navigate = useNavigate()
+export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, activeUserId }) => {
+	const {
+		updateFirebaseDb,
+		errorMsg,
+		loading,
+	} = useFirebaseUpdates()
+	const [selectedOption, setSelectedOption] = useState<UserPreferences['mealsPerDay'] | null>(null);
+	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
 	const choices = [1, 2]
 
-	const handleChoice = async (choice: UserPreferences['mealsPerDay']) => {
-		resetError()
-		setSelectedOption(choice)
 
-		try {
-			setLoadingStatus(true)
+	useEffect(() => {
+		if (isLoading) { return }
+		if (initialFetchCompleted) { return }
 
-			// logic for updating preferences in the db
-			await updateUserPreferences(choice, 'mealsPerDay')
+		const preferences = extractPreferences(userDocs, activeUserId, 'mealsPerDay')
+		setSelectedOption(preferences as UserPreferences['mealsPerDay'])
+		setInitialFetchCompleted(true)
 
-			//navigate to next question after 2 secs
-			setTimeout(() => { navigate('/questions/food-preferences') }, 500)
+		// eslint-disable-next-line
+	}, [initialFetchCompleted, isLoading])
 
-			console.log('update in db succeeded')
+	useEffect(() => {
+		if (!initialFetchCompleted) { return }
+		if (!selectedOption) { return }
 
-		} catch (error) {
-			handleError(error)
-
-		} finally {
-			setLoadingStatus(false)
-		}
-	}
+		updateFirebaseDb(selectedOption, 'mealsPerDay')
+		// eslint-disable-next-line
+	}, [selectedOption])
 
 	return (
 		<div className="flex flex-col gap-4 text-center">
-			<h3 className="">How many meals per day do you wish to see in your mealplan?</h3>
-
+			<div>
+				<h3 className="mb-2">How many meals per day do you wish to see in your mealplan?</h3>
+				<p className="text-xs text-gray-500">You can choose more than one option.</p>
+			</div>
 			{errorMsg &&
 				<Alert body={errorMsg} color='red' />
 			}
@@ -49,7 +51,7 @@ export const MealsPerDay = () => {
 					<Pill
 						disabled={loading}
 						key={choice}
-						onClick={() => handleChoice(choice as UserPreferences['mealsPerDay'])}
+						onClick={() => setSelectedOption(choice as UserPreferences['mealsPerDay'])}
 						isActive={selectedOption === choice}
 					>
 						{choice}
