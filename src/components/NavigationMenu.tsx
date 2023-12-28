@@ -6,7 +6,7 @@ export const NavigationMenu = () => {
 	const { userName } = useAuthContext()
 
 	return (
-		<div className="flex justify-between items-center">
+		<div className="flex justify-between items-center text-white">
 			<h1 className="text-lg font-bold">
 				<Link to="/">Maträttsroulette 🥘</Link>
 			</h1>

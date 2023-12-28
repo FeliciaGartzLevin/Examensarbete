@@ -15,12 +15,12 @@ import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
 
 export const App = () => {
 	return (
-		<div className="font-primary grid grid-cols-1 grid-rows-app min-h-screen">
+		<div className="font-primary grid grid-cols-1 grid-rows-app min-h-screen px-4 bg-dark-background">
 			<div className="span-1">
 				<NavigationMenu />
 			</div>
 
-			<div className="span-1">
+			<div className="span-1 ">
 				<Routes>
 					{/* Guest Routes */}
 					<Route path="*" element={<NotFoundPage />} />

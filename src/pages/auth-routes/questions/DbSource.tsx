@@ -49,6 +49,7 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 			<div className="flex flex-col justify-center gap-6 sm:flex-row mb-4">
 				{choices.map((choice) => (
 					<Pill
+						className="text-sm"
 						disabled={loading}
 						key={choice.value}
 						onClick={() => setSelectedOption(choice.value as UserPreferences['generateFrom'])}

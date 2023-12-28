@@ -35,7 +35,7 @@ export const QuestionsPage = () => {
 	}, [])
 
 	return (
-		<div className="bg-dark-background h-full flex flex-col justify-center items-center">
+		<div className="h-full flex flex-col justify-center items-center">
 
 			<div className="w-[90%] sm:w-[60%]">
 				<div className="relative -top-8">
