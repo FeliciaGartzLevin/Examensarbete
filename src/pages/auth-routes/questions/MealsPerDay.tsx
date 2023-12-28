@@ -14,8 +14,13 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 	} = useFirebaseUpdates()
 	const [selectedOption, setSelectedOption] = useState<UserPreferences['mealsPerDay'] | null>(null);
 	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
+	const [firstClickDone, setFirstClickDone] = useState<boolean>(false)
 	const choices = [1, 2]
 
+	const handleClick = (choice: UserPreferences['mealsPerDay']) => {
+		setSelectedOption(choice as UserPreferences['mealsPerDay'])
+		setFirstClickDone(true)
+	}
 
 	useEffect(() => {
 		if (isLoading) { return }
@@ -31,6 +36,7 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 	useEffect(() => {
 		if (!initialFetchCompleted) { return }
 		if (!selectedOption) { return }
+		if (!firstClickDone) { return }
 
 		updateFirebaseDb(selectedOption, 'mealsPerDay')
 		// eslint-disable-next-line
@@ -51,7 +57,7 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 					<Pill
 						disabled={loading}
 						key={choice}
-						onClick={() => setSelectedOption(choice as UserPreferences['mealsPerDay'])}
+						onClick={() => handleClick(choice as UserPreferences['mealsPerDay'])}
 						isActive={selectedOption === choice}
 					>
 						{choice}

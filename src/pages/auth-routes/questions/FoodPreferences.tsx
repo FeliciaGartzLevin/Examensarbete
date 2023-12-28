@@ -15,6 +15,7 @@ export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading,
 	} = useFirebaseUpdates()
 	const [selectedOptions, setSelectedOptions] = useState<UserPreferences['foodPreferences']>([])
 	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
+	const [firstClickDone, setFirstClickDone] = useState<boolean>(false)
 	const foodPrefs = ['Vegetarian', 'Vegan', 'Glutenfree', 'Lactose-free']
 
 	const handleChoice = (foodPref: Preference) => {
@@ -25,6 +26,7 @@ export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading,
 				: [...prevSelectedOptions, foodPref]
 		})
 
+		setFirstClickDone(true)
 	}
 
 	useEffect(() => {
@@ -41,6 +43,8 @@ export const FoodPreferences: React.FC<QuestionsProps> = ({ userDocs, isLoading,
 
 	useEffect(() => {
 		if (!initialFetchCompleted) { return }
+		if (!selectedOptions) { return }
+		if (!firstClickDone) { return }
 
 		updateFirebaseDb(selectedOptions, 'foodPreferences')
 		// eslint-disable-next-line

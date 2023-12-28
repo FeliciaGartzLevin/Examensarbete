@@ -14,10 +14,16 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 	} = useFirebaseUpdates()
 	const [selectedOption, setSelectedOption] = useState<UserPreferences['generateFrom'] | null>(null);
 	const [initialFetchCompleted, setInitialFetchCompleted] = useState(false)
+	const [firstClickDone, setFirstClickDone] = useState<boolean>(false)
 	const choices = [
 		{ text: 'All dishes', value: 'allDishes' },
 		{ text: 'Only my own', value: 'ownDishes' },
 	]
+
+	const handleClick = (choice: UserPreferences['generateFrom']) => {
+		setSelectedOption(choice as UserPreferences['generateFrom'])
+		setFirstClickDone(true)
+	}
 
 	useEffect(() => {
 		if (isLoading) { return }
@@ -33,6 +39,7 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 	useEffect(() => {
 		if (!initialFetchCompleted) { return }
 		if (!selectedOption) { return }
+		if (!firstClickDone) { return }
 
 		updateFirebaseDb(selectedOption, 'generateFrom')
 		// eslint-disable-next-line
@@ -52,7 +59,7 @@ export const DbSource: React.FC<QuestionsProps> = ({ userDocs, isLoading, active
 						className="text-sm"
 						disabled={loading}
 						key={choice.value}
-						onClick={() => setSelectedOption(choice.value as UserPreferences['generateFrom'])}
+						onClick={() => handleClick(choice.value as UserPreferences['generateFrom'])}
 						isActive={selectedOption === choice.value}
 					>
 						{choice.text}
