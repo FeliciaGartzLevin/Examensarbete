@@ -7,6 +7,7 @@ import { useAuthContext } from '../../hooks/useAuthContext'
 import { useState } from 'react'
 import { Alert } from '../../components/generic utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
+import { Divider } from '../../components/generic utilities/Divider'
 
 export const SignInPage = () => {
 	const { signin } = useAuthContext()
@@ -37,7 +38,7 @@ export const SignInPage = () => {
 	return (
 		<div className="h-full flex justify-center items-center">
 			<div className="w-full max-w-xs">
-				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
+				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-2xl rounded px-8 pt-6 pb-8 mb-4">
 					<h2 className='text-lg text-center font-bold mb-1'>
 						Sign in
 					</h2>
@@ -81,14 +82,16 @@ export const SignInPage = () => {
 							{loading
 								? 'Signing in... '
 								: 'Sign in'}
-						</Button>					</div>
+						</Button>
+					</div>
+					<Divider symbol />
+					<div className="text-center text-gray-500 text-xs">
+						<p>Don't have an account?</p>
+						<p>
+							Go to <Link className='font-bold hover:text-link-hover' to='/sign-up'>sign up</Link>.
+						</p>
+					</div>
 				</form>
-				<div className="text-center text-light-background text-xs">
-					<p>Don't have an account?</p>
-					<p>
-						Go to <Link className='font-bold hover:text-link-hover' to='/sign-up'>sign up</Link>.
-					</p>
-				</div>
 			</div>
 		</div>
 	)

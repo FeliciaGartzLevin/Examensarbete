@@ -11,6 +11,11 @@ export default {
 	],
 	theme: {
 		extend: {
+			backgroundImage: {
+				'light-dinner': "url('/src/assets/img/light-dinner.jpg')",
+				'dark-dinner': "url('/src/assets/img/dark-dinner.jpg')",
+				'neutral-dinner': "url('/src/assets/img/neutral-dinner.jpg')",
+			},
 			colors: {
 				'primary-text': '#0F172A',
 				'light-background': '#FAF9F2',
@@ -32,7 +37,7 @@ export default {
 				primary: ['"Montserrat"', 'sans-serif']
 			},
 			gridTemplateRows: {
-				'app': '2.3rem 1fr'
+				'app': '4.5rem 1fr'
 			},
 		},
 	},

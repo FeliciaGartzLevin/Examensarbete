@@ -20,7 +20,7 @@ export const UserPreferencesPage = () => {
 					activeUserId={activeUser?.uid}
 				/>
 			</div>
-			<Divider symbol />
+			<Divider className="py-6" symbol />
 			<div className="flex flex-col">
 				<FoodPreferences
 					userDocs={userDocs}
@@ -28,7 +28,7 @@ export const UserPreferencesPage = () => {
 					activeUserId={activeUser?.uid}
 				/>
 			</div>
-			<Divider symbol />
+			<Divider className="py-6" symbol />
 			<div>
 				<DbSource
 					userDocs={userDocs}

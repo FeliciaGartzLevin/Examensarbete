@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom"
-import { NavigationMenu } from "./components/NavigationMenu"
+import { NavigationMenu } from "./components/navmenu/NavigationMenu"
 import { NotFoundPage } from "./pages/guest-routes/NotFoundPage"
 import { ResetPasswordPage } from "./pages/guest-routes/ResetPasswordPage"
 import { SignInPage } from "./pages/guest-routes/SignInPage"
@@ -12,15 +12,17 @@ import { SettingsPage } from "./pages/auth-routes/settings/SettingsPage"
 import { AccountSettingsPage } from "./pages/auth-routes/settings/AccountSettingsPage"
 import { UserPreferencesPage } from "./pages/auth-routes/settings/UserPreferencesPage"
 import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
+import { MealsOverView } from "./pages/auth-routes/MealsOverView"
+import { WeeksOverview } from "./pages/auth-routes/WeeksOverview"
 
 export const App = () => {
 	return (
-		<div className="font-primary grid grid-cols-1 grid-rows-app min-h-screen px-4 bg-dark-background">
-			<div className="span-1">
+		<div className="font-primary grid grid-cols-1 grid-rows-app min-h-screen bg-neutral-dinner bg-cover">
+			<div className="span-1 sticky top-0 z-10">
 				<NavigationMenu />
 			</div>
 
-			<div className="span-1 ">
+			<div className="span-1 px-4">
 				<Routes>
 					{/* Guest Routes */}
 					<Route path="*" element={<NotFoundPage />} />
@@ -57,6 +59,18 @@ export const App = () => {
 					<Route path="/questions/*" element={
 						<AuthControl>
 							<QuestionsPage />
+						</AuthControl>
+					} />
+
+					<Route path="/meals" element={
+						<AuthControl>
+							<MealsOverView />
+						</AuthControl>
+					} />
+
+					<Route path="/weeks" element={
+						<AuthControl>
+							<WeeksOverview />
 						</AuthControl>
 					} />
 

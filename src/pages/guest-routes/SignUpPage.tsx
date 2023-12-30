@@ -7,6 +7,8 @@ import { useAuthContext } from '../../hooks/useAuthContext'
 import { useState } from 'react'
 import { Alert } from '../../components/generic utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
+import { Divider } from '../../components/generic utilities/Divider'
+import { TbUserPlus } from "react-icons/tb";
 
 export const SignUpPage = () => {
 	const { signup } = useAuthContext()
@@ -37,7 +39,7 @@ export const SignUpPage = () => {
 	return (
 		<div className="h-full flex justify-center items-center">
 			<div className="w-full max-w-xs">
-				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-md rounded px-8 pt-6 pb-8 mb-4">
+				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-2xl rounded px-8 pt-6 pb-8 mb-4">
 					<h2 className='text-lg text-center font-bold mb-1'>
 						Sign up
 					</h2>
@@ -109,20 +111,26 @@ export const SignUpPage = () => {
 						{errors.confirmPassword && <p className="errorMsgStyling">{errors.confirmPassword.message ?? "Invalid value"}</p>}
 					</div>
 
-					<div className="flex justify-end">
+					<div className="flex justify-center mb-3">
 						<Button disabled={loading} type='submit'>
 							{loading
 								? 'Signing up... '
-								: 'Sign up'}
+								: (
+									<div className='flex justify-center items-center gap-2'>
+										<p><TbUserPlus size={22} /></p>
+										<p>Sign up</p>
+									</div>
+								)}
 						</Button>
 					</div>
+					<Divider symbol />
+					<div className="text-center text-gray-500 text-xs">
+						<p>Do you already have an account?</p>
+						<p>
+							Go to <Link className='font-bold hover:text-link-hover' to='/sign-in'>sign in</Link>.
+						</p>
+					</div>
 				</form>
-				<div className="text-center text-light-background text-xs">
-					<p>Do you already have an account?</p>
-					<p>
-						Go to <Link className='font-bold hover:text-link-hover' to='/sign-in'>sign in</Link>.
-					</p>
-				</div>
 			</div>
 		</div>
 	)
