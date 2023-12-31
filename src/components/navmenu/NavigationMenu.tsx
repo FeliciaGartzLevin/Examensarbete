@@ -5,8 +5,9 @@ import Logo from "./Logo";
 import { FaUserShield } from "react-icons/fa6";
 import { FaHamburger } from "react-icons/fa";
 import { TbCarrotOff } from "react-icons/tb";
-import { useEffect, useRef, useState } from "react";
-import { NavLinks } from "./Navlinks";
+import { useRef, useState } from "react";
+import { NavLinks } from "./NavLinks";
+import { useCloseOnClickOutside } from "../../hooks/useCloseOnClickOutside";
 
 
 export const NavigationMenu = () => {
@@ -34,18 +35,7 @@ export const NavigationMenu = () => {
 	)
 
 	// makes the drop down menu close when clicking outside it
-	useEffect(() => {
-		const clickHandler = (e: MouseEvent) => {
-			if (!menuRef.current?.contains(e.target as Node)) {
-				setIsOpen(false)
-			}
-		}
-		document.addEventListener("mousedown", clickHandler)
-
-		return () => {
-			document.addEventListener("mousedown", clickHandler)
-		}
-	}, [menuRef])
+	useCloseOnClickOutside(menuRef, () => setIsOpen(false))
 
 	return (
 		<nav className="flex flex-col backdrop-filter backdrop-blur-lg bg-opacity-30 bg-white">
