@@ -12,7 +12,7 @@ export const signUpSchema = z
 			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
 
 		password: z
-			.string()
+			.string({ description: '-at least 8 characters' })
 			.min(8, { message: "Password must be at least 8 characters" })
 			.max(80, { message: "Password can be no longer than 80 characters. Please use a shorter password." }),
 

@@ -22,7 +22,8 @@ export default {
 				'dark-background': '#253C33',
 				'link-hover': '#188C57',
 				button: {
-					'bg': '#19945D',
+					'green': '#19945D',
+					'green-hover': '#188C57',
 				},
 				alert: {
 					'red': '#EF4444',

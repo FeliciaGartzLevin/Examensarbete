@@ -11,7 +11,7 @@ export const UserPreferencesPage = () => {
 
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-4 px-4">
 			<h3 className="h2">Preferences</h3>
 			<div>
 				<MealsPerDay

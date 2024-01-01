@@ -38,3 +38,7 @@
 	-webkit-text-stroke: 1px black;
 	font-family: 'Poppins', sans-serif;
 }
+
+input#star[type="radio"] {
+	display: none;
+}
