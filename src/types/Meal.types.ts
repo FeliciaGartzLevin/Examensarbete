@@ -27,7 +27,7 @@ export const categories = [
 export type Category = typeof categories[number]
 
 export type Meal = CreateMealSchema & {
-	// _id: string
+	_id: string
 	owner: string // userId of the creator
 	rating: number | null
 }

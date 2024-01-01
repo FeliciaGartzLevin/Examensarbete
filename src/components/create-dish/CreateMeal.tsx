@@ -7,11 +7,9 @@ import { Alert } from '../generic utilities/Alert'
 import { StarRating } from './StarRating'
 import { categories } from '../../types/Meal.types'
 import Select from 'react-select'
-import { useAuthContext } from '../../hooks/useAuthContext'
 import { useFirebaseUpdates } from '../../hooks/useFirebaseUpdates'
 
 export const CreateMeal = () => {
-	const { activeUser } = useAuthContext()
 	const [starRating, setStarRating] = useState<number | null>(null)
 	const {
 		loading,
@@ -51,11 +49,6 @@ export const CreateMeal = () => {
 			console.log('submitted data', data);
 
 			await createNewMeal(data, starRating)
-			// add everything, plus userId to owner: 'ahs3456dfbdfgm'
-
-			// stars can be in their own firebase document, connected to the dish and the user Id,
-			// because depending on who shows the dish, the grade will be different.
-			// or shall it be an average value based on all ratings maybe?
 
 		} catch (error) {
 			handleError(error)
@@ -67,6 +60,7 @@ export const CreateMeal = () => {
 	useEffect(() => {
 		if (!isSubmitSuccessful) { return }
 		reset()
+		setStarRating(null)
 	}, [isSubmitSuccessful, reset])
 
 	return (
@@ -116,6 +110,10 @@ export const CreateMeal = () => {
 					<div className="mb-4">
 						<label className="labelStyling" aria-label="category">
 							Category*
+							<p className='text-xs font-thin text-gray-500'>
+								More than one can be chosen
+							</p>
+
 						</label>
 
 						<Controller
@@ -127,7 +125,7 @@ export const CreateMeal = () => {
 									styles={{
 										control: (baseStyles) => ({
 											...baseStyles,
-											borderColor: errors.category ? '#EF4444' : 'gray',
+											borderColor: errors.category ? '#EF4444' : 'none',
 										}),
 									}}
 									className='mb-2'
@@ -136,6 +134,7 @@ export const CreateMeal = () => {
 									onChange={val => onChange(val.map(c => c.value))}
 									options={options}
 									isMulti
+									blurInputOnSelect
 								/>
 							)}
 						/>
