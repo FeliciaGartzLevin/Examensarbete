@@ -4,15 +4,18 @@ export const signUpSchema = z
 	.object({
 		email: z
 			.string()
+			.trim()
 			.email({ message: "A valid email adress must be specified" }),
 
 		name: z
 			.string()
+			.trim()
 			.min(2, { message: "Name must be at least 2 characters" })
 			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
 
 		password: z
 			.string({ description: '-at least 8 characters' })
+			.trim()
 			.min(8, { message: "Password must be at least 8 characters" })
 			.max(80, { message: "Password can be no longer than 80 characters. Please use a shorter password." }),
 
@@ -33,10 +36,12 @@ export const signInSchema = z
 	.object({
 		email: z
 			.string()
+			.trim()
 			.email({ message: "Email adress must be specified" }),
 
 		password: z
 			.string()
+			.trim()
 			.min(1, { message: "Password must be specified" })
 	})
 
@@ -48,6 +53,7 @@ export const resetPasswordSchema = z
 	.object({
 		email: z
 			.string()
+			.trim()
 			.email({ message: "Email adress must be specified" }),
 	})
 
@@ -59,15 +65,18 @@ export const editAccountSchema = z
 	.object({
 		email: z
 			.string()
+			.trim()
 			.email({ message: "A valid email adress must be specified" }),
 
 		name: z
 			.string()
+			.trim()
 			.min(2, { message: "Name must be at least 2 characters" })
 			.max(80, { message: "Name can be no longer than 80 characters. Please use a shorter version of your name." }),
 
 		password: z
 			.string()
+			.trim()
 			.min(8, { message: "Password must be at least 8 characters" })
 			.max(80, { message: "Password can be no longer than 80 characters. Please use a shorter password." }),
 

@@ -5,10 +5,12 @@ export const createMealSchema = z
 	.object({
 		name: z
 			.string()
+			.trim()
 			.min(5, "Name must be at least 5 characters")
 			.max(100, "Name can be no longer than 100 characters. Please use a shorter version of the name."),
 		link: z
 			.string()
+			.trim()
 			.nullable()
 			.refine((data) => {
 				if (data && data !== '') {
@@ -27,6 +29,7 @@ export const createMealSchema = z
 			),
 		description: z
 			.string()
+			.trim()
 			.max(1000, "The description can be max 1000 words")
 			.nullable()
 	})
