@@ -17,7 +17,7 @@ export const StarRating: React.FC<StarRatingProps> = ({ onClick, rating }) => {
 					const currentRating = index + 1;
 
 					return (
-						<label title={'star ' + currentRating}>
+						<label key={currentRating} title={'star ' + currentRating}>
 							<input
 								aria-label={'star ' + currentRating}
 								id='star'
