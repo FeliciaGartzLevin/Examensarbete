@@ -23,7 +23,7 @@ export const App = () => {
 				<NavigationMenu />
 			</div>
 
-			<div className="span-1 px-4">
+			<div className="span-1 sm:px-4">
 				<Routes>
 					{/* Guest Routes */}
 					<Route path="*" element={<NotFoundPage />} />
