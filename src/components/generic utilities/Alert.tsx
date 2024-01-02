@@ -27,7 +27,7 @@ export const Alert: React.FC<AlertProps> = ({ header, body, color, className }) 
 	}
 
 	return (
-		<div className={'my-2 text-sm font-semibold p-3 border-2 rounded-lg ' + colorClasses + ' ' + className}>
+		<div className={'shadow my-2 text-sm font-semibold p-3 border-2 rounded-lg ' + colorClasses + ' ' + className}>
 			{header && <h2 className='mb-2 text-lg font-bold'>{header}</h2>}
 			{body && <p>{body}</p>}
 		</div>

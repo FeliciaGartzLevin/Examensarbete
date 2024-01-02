@@ -12,19 +12,29 @@ import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../LoadingSpinner'
 import { ContentContainer } from '../generic utilities/ContentContainer'
 import { Dropzone } from './Dropzone'
+import { useUploadImage } from '../../hooks/useUploadImage'
 
 export const CreateMeal = () => {
 	const [starRating, setStarRating] = useState<number | null>(null)
 	const { windowSizeisLoading, windowWidth } = useWindowSize()
 	const [image, setImage] = useState<File | null>(null)
+	const [success, setSuccess] = useState(false)
+
 	const {
 		loading,
 		setLoadingStatus,
 		errorMsg,
 		resetError,
 		handleError,
-		createNewMeal
+		createNewMeal,
 	} = useFirebaseUpdates()
+
+	const {
+		imageUploadErrorMsg,
+		uploadImage,
+		isUploadingImage
+	} = useUploadImage()
+
 	const {
 		handleSubmit,
 		register,
@@ -45,19 +55,46 @@ export const CreateMeal = () => {
 		}
 	})
 
+	// helper function to upload image and get the url
+	const uploadAndGetImageUrl = async (image: File | null) => {
+		if (!image) { return null }
+
+		// if image exists, try uploading it to Firebase Storage
+		try {
+			const url = await uploadImage(image)
+
+			return url
+		} catch (error) {
+			handleError(error)
+		}
+	}
+
+	// handling when user is submitting the form
 	const onSubmit: SubmitHandler<CreateMealSchema> = async (data) => {
 		resetError()
+		setSuccess(false)
+
+		// scroll smoothly to top
+		window.scrollTo({
+			top: 0,
+			left: 0,
+			behavior: 'smooth'
+		})
 
 		try {
 			setLoadingStatus(true)
 
-			console.log('submitted data', data)
+			// uploading image, if any, to firebase storage + getting url for new image
+			const url = await uploadAndGetImageUrl(image)
 
-			await createNewMeal(data, starRating, image)
+			// creating new meal in firebase db
+			await createNewMeal(data, starRating, url)
 
-
+			// show confirmation alert
+			setSuccess(true)
 		} catch (error) {
 			handleError(error)
+			setSuccess(false)
 		} finally {
 			setLoadingStatus(false)
 		}
@@ -65,118 +102,153 @@ export const CreateMeal = () => {
 
 	useEffect(() => {
 		if (!isSubmitSuccessful) { return }
+
 		reset()
 		setStarRating(null)
 	}, [isSubmitSuccessful, reset])
 
-	if (windowSizeisLoading) {
+	useEffect(() => {
+		if (!success) { return }
+
+		// hide the success alert after 5 secs
+		const timeoutId = setTimeout(() => {
+			setSuccess(false)
+		}, 5000)
+
+		// Clear the timeout when the component unmounts
+		return () => clearTimeout(timeoutId)
+	}, [success])
+
+	if (windowSizeisLoading || isUploadingImage) {
 		return <LoadingSpinner />
 	}
 
 	return (
 		<ContentContainer>
 			<h2 className='h2 mb-6'>
-				Create new dish
+				Create new meal
 			</h2>
-			<div className='grid grid-col-1'>
-
-				{errorMsg &&
-					<Alert body={errorMsg} color='red' />
-				}
+			<div className='grid grid-cols-1 gap-4 '>
 				<section className='mb-4'>
-					<div className='mb-6'>
-						<h3 className='labelStyling mb-3'>Image</h3>
-						<Dropzone resetOnUpload={isSubmitSuccessful} liftImageUp={(image: File | null) => setImage(image)} />
-					</div>
+					<section className='mb-4'>
+						{errorMsg &&
+							<Alert header={'Error'} body={errorMsg} color='red' />
+						}
 
-					<div className=''>
-						<label className="labelStyling" aria-label="name">
-							Rating
-						</label>
-						<StarRating rating={starRating} onClick={(rating) => setStarRating(rating)} />
-					</div>
+						{imageUploadErrorMsg &&
+							<Alert header={'Error'} body={imageUploadErrorMsg} color='red' />
+						}
+
+						{success &&
+							<Alert
+								color='green'
+								body={
+									<p>
+										New meal was successfully created.<br />
+										Now you can create more if you want.
+									</p>}
+							/>
+						}
+					</section>
+
+					<section>
+						<div className='mb-6'>
+							<h3 className='labelStyling mb-3'>Image</h3>
+							<Dropzone resetOnUpload={isSubmitSuccessful} liftImageUp={(image: File | null) => setImage(image)} />
+						</div>
+
+						<div className=''>
+							<label className="labelStyling" aria-label="name">
+								Rating
+							</label>
+							<StarRating rating={starRating} onClick={(rating) => setStarRating(rating)} />
+						</div>
+					</section>
 				</section>
 
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<div className="mb-4">
-						<label className="labelStyling" aria-label="name">
-							Name*
-						</label>
-						<input
-							className={errors.name ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="name"
-							type="name"
-							placeholder="eg. Pasta carbonara"
-							{...register('name')}
-						/>
-						{errors.name && <p className="errorMsgStyling">{errors.name.message ?? "Invalid value"}</p>}
+					<div className='grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-10 lg:justify-start mb-4'>
+						<div>
+							<label id='name' className="labelStyling" aria-label="name">
+								Name*
+							</label>
+							<input
+								className={errors.name ? "errorInputStyling" : "defaultInputStyling"}
+								type="name"
+								placeholder="eg. Pasta carbonara"
+								{...register('name')}
+							/>
+							{errors.name && <p className="errorMsgStyling">{errors.name.message ?? "Invalid value"}</p>}
+						</div>
+
+						<div>
+							<label id='link' className="labelStyling" aria-label="link">
+								External link to recipe
+							</label>
+							<input
+								className={errors.link ? "errorInputStyling" : "defaultInputStyling"}
+								type="text"
+								placeholder="url"
+								{...register('link')}
+							/>
+							{errors.link && <p className="errorMsgStyling">{errors.link.message ?? "Invalid value"}</p>}
+						</div>
+
+						<div>
+							<label className="labelStyling" aria-label="category">
+								Category*
+								<p className='text-xs font-thin text-gray-500'>
+									More than one can be chosen
+								</p>
+							</label>
+
+							<Controller
+								control={control}
+								defaultValue={[]}
+								name="category"
+								render={({ field: { onChange, value } }) => (
+									<Select
+										styles={{
+											control: (baseStyles) => ({
+												...baseStyles,
+												borderColor: errors.category ? '#EF4444' : 'none',
+												marginBottom: '1rem'
+											}),
+										}}
+										classNames={{
+											control: () => "shadow",
+										}}
+										name="category"
+										value={options.filter(choice => value.includes(choice.value))}
+										onChange={val => onChange(val.map(choice => choice.value))}
+										options={options}
+										isMulti
+										blurInputOnSelect={windowWidth ? windowWidth < 640 : false}
+									/>
+								)}
+							/>
+							{errors.category && <p className="errorMsgStyling">{errors.category.message ?? "Invalid value"}</p>}
+						</div>
+
+						<div>
+							<label className="labelStyling" aria-label="description">
+								Description
+							</label>
+							<textarea
+								className={errors.description ? "errorInputStyling" : "defaultInputStyling"}
+								placeholder="eg. recipe or instructions"
+								{...register('description')}
+							/>
+							{errors.description && <p className="errorMsgStyling">{errors.description.message ?? "Invalid value"}</p>}
+						</div>
 					</div>
+					<p className='text-xs text-gray-500 mb-4'><span className='text-lg'>*</span> = mandatory fields</p>
 
-					<div className="mb-4">
-						<label className="labelStyling" aria-label="link">
-							External link to recipe
-						</label>
-						<input
-							className={errors.link ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="link"
-							type="text"
-							placeholder="url"
-							{...register('link')}
-						/>
-						{errors.link && <p className="errorMsgStyling">{errors.link.message ?? "Invalid value"}</p>}
+					<div className='flex justify-center items-center'>
+						<Button type='submit' disabled={loading}>
+							Submit
+						</Button>
 					</div>
-
-					<div className="mb-4">
-						<label className="labelStyling" aria-label="category">
-							Category*
-							<p className='text-xs font-thin text-gray-500'>
-								More than one can be chosen
-							</p>
-
-						</label>
-
-						<Controller
-							control={control}
-							defaultValue={[]}
-							name="category"
-							render={({ field: { onChange, value } }) => (
-								<Select
-									styles={{
-										control: (baseStyles) => ({
-											...baseStyles,
-											borderColor: errors.category ? '#EF4444' : 'none',
-										}),
-									}}
-									className='mb-2'
-									name="category"
-									value={options.filter(c => value.includes(c.value))}
-									onChange={val => onChange(val.map(c => c.value))}
-									options={options}
-									isMulti
-									blurInputOnSelect={windowWidth ? windowWidth < 640 : false}
-								/>
-							)}
-						/>
-						{errors.category && <p className="errorMsgStyling">{errors.category.message ?? "Invalid value"}</p>}
-					</div>
-
-					<div className="mb-4">
-						<label className="labelStyling" aria-label="description">
-							Description
-						</label>
-						<textarea
-							className={errors.description ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="description"
-							placeholder="eg. recipe or instructions"
-							{...register('description')}
-						/>
-						{errors.description && <p className="errorMsgStyling">{errors.description.message ?? "Invalid value"}</p>}
-						<p className='text-xs text-gray-500'><span className='text-lg'>*</span> = mandatory fields</p>
-					</div>
-
-					<Button type='submit' disabled={loading}>
-						Submit
-					</Button>
 				</form>
 			</div>
 		</ContentContainer>
