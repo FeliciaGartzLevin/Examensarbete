@@ -9,13 +9,14 @@ import { Alert } from "../../components/generic utilities/Alert"
 import { extractPreferences } from "../../helpers/questionHelpers"
 import { useAuthContext } from "../../hooks/useAuthContext"
 import { UserPreferences } from "../../types/User.types"
-import { CreateMeal } from "../../components/create-dish/CreateMeal"
+import { CreateMeal } from "../../components/create-update-meal/CreateMeal"
 import { Modal } from "../../components/generic utilities/Modal"
+import { IoMdSettings } from "react-icons/io";
+import { Divider } from "../../components/generic utilities/Divider"
 
 export const LandingPage = () => {
 	const { activeUser } = useAuthContext()
 	const { data: userDocs, isLoading, isError, error } = useStreamUserPreferences()
-	const [createDishIsOpen, setCreateDishIsOpen] = useState<boolean>(true)
 
 	// det är nog bättre att skicka in till en generera week menu här som får
 	// ge ett error om att det inte finns tillräckligt med maträtter, sen rendera error här.
@@ -68,33 +69,30 @@ export const LandingPage = () => {
 			Jämför antalet som behövs med antalet i db, då antingen om det är min egen db eller alla rätter.
 			visa SKAPA RÄTTER istället för ovan om det inte finns tillräckligt med rätter */}
 
-			<section className="flex flex-col gap-2">
-				<p>
+			<section className="flex flex-col gap-4">
+				<p className="w-80">
 					{/* Your preferences for creating the the weekly meal plan is */}
-					There is not enough dishes in the db for generating a weekly menu.
+					There is not enough meals in the db for generating a weekly menu outgoing from your preferences.
 				</p>
-				<div>
-					<Button onClick={() => setCreateDishIsOpen(true)}>
+				<Link to="/create-meal">
+					<Button>
 						Create dish
 					</Button>
-				</div>
+				</Link>
 			</section>
 
-			{createDishIsOpen &&
-				<Modal hide={() => setCreateDishIsOpen(false)}>
-					<CreateMeal></CreateMeal>
-				</Modal>
-			}
 
+			<section className="flex flex-col items-center gap-0">
+				<Divider symbol={<IoMdSettings />} className="py-2" />
 
-			<section className="flex flex-col gap-0">
-				<p className="text-xs text-gray-500">Having certain preferences?</p>
-				<Link to="/settings/preferences">
+				<p className="text-xs text-gray-500">Having other default preferences?</p>
+
+				<Link to="/settings/preferences" className="m-0">
 					<button
 						type="button"
-						className="text-xs text-gray-500 hover:text-link-hover font-semibold"
+						className="m-0 text-xs text-gray-500 hover:text-link-hover font-semibold inline-flex gap-1 items-center"
 					>
-						Change in settings.
+						Change them in settings.
 					</button>
 				</Link>
 			</section>

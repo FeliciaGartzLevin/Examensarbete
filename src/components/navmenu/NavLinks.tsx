@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom"
+import { BsJournalPlus } from "react-icons/bs"
 
 type NavLinksProps = {
 	className?: string
@@ -15,13 +16,18 @@ export const NavLinks: React.FC<NavLinksProps> = ({ className, onClick, signOutB
 				</NavLink>
 			</li>
 			<li>
+				<NavLink to="/create-meal" className="inline-flex items-center gap-2">
+					<BsJournalPlus /> Create new meal
+				</NavLink>
+			</li>
+			<li>
 				<NavLink to="/meals">
-					Meals
+					Meals overview
 				</NavLink>
 			</li>
 			<li>
 				<NavLink to="/weeks">
-					Weeks
+					Weeks overview
 				</NavLink>
 			</li>
 			<li>
