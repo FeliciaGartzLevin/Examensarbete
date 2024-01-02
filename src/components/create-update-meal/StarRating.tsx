@@ -27,7 +27,7 @@ export const StarRating: React.FC<StarRatingProps> = ({ onClick, rating }) => {
 								onChange={() => onClick(currentRating)}
 							/>
 							<span
-								className="cursor-pointer text-[3rem] inline-flex mx-1"
+								className="drop-shadow cursor-pointer text-[3rem] inline-flex mx-1"
 								style={{
 									color:
 										currentRating <= (hover || rating || 0) ? "#ffc107" : "#e4e5e9"

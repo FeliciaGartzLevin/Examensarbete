@@ -53,7 +53,6 @@ export const SignInPage = () => {
 						</label>
 						<input
 							className={errors.email ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="email"
 							type="email"
 							placeholder="Your email"
 							{...register('email')}
@@ -67,7 +66,6 @@ export const SignInPage = () => {
 						</label>
 						<input
 							className={errors.password ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="password"
 							type="password"
 							placeholder="******************"
 							{...register('password')}

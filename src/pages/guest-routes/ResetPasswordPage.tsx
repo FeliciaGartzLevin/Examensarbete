@@ -25,7 +25,6 @@ export const ResetPasswordPage = () => {
 	const onSubmit: SubmitHandler<ResetPasswordSchema> = async (data) => {
 		resetError()
 		setConfirmationMsg(null)
-		console.log('sending request to reset password');
 
 		try {
 			setLoading(true)
@@ -75,7 +74,6 @@ export const ResetPasswordPage = () => {
 						</label>
 						<input
 							className={errors.email ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="email"
 							type="email"
 							placeholder="Your email"
 							{...register('email')}

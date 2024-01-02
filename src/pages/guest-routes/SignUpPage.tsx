@@ -57,7 +57,6 @@ export const SignUpPage = () => {
 						</label>
 						<input
 							className={errors.email ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="email"
 							type="email"
 							placeholder="Your email"
 							{...register('email')}
@@ -71,7 +70,6 @@ export const SignUpPage = () => {
 						</label>
 						<input
 							className={errors.name ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="name"
 							type="text"
 							placeholder="Your name"
 							{...register('name')}
@@ -88,7 +86,6 @@ export const SignUpPage = () => {
 						</label>
 						<input
 							className={errors.password ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="password"
 							type="password"
 							placeholder="******************"
 							{...register('password')}
@@ -103,7 +100,6 @@ export const SignUpPage = () => {
 						</label>
 						<input
 							className={errors.confirmPassword ? "errorInputStyling" : "defaultInputStyling"}
-							aria-labelledby="confirmPassword"
 							type="password"
 							placeholder="******************"
 							{...register('confirmPassword')}

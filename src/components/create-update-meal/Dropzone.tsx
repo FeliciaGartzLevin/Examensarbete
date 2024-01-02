@@ -16,11 +16,9 @@ export const Dropzone: React.FC<DropzoneProps> = ({ liftImageUp, resetOnUpload }
 
 	const onDrop = useCallback((acceptedFiles: File[]) => {
 		if (!acceptedFiles.length) {
-			console.log("No file to upload")
 			return
 		}
 
-		console.log('acceptedFile', acceptedFiles[0])
 		setPreview(URL.createObjectURL(acceptedFiles[0]))
 
 		// lift image to parent component where upload will be handled
@@ -70,7 +68,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({ liftImageUp, resetOnUpload }
 			<input {...getInputProps()} />
 			<p>Drag and drop a file here or click to browse.</p>
 
-			<div className="text-3xl">
+			<div className="text-3xl mb-2">
 				{isDragActive
 					? isDragAccept
 						? <div><FaCheck size={40} color={'text-green-700'} /></div>
@@ -79,7 +77,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({ liftImageUp, resetOnUpload }
 				}
 			</div>
 			{preview &&
-				<div className='relative'>
+				<div className='relative max-w-[50%]'>
 					<img
 						alt='preview of uploaded image'
 						src={preview}
@@ -90,7 +88,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({ liftImageUp, resetOnUpload }
 						type='button'
 						onClick={(e) => handleRemovePreview(e)}
 						className='z-10 absolute flex items-center justify-center p-3 -top-4 -right-4 rounded-full text-light-background bg-gray-900'>
-						<IoClose />
+						<IoClose size={20} />
 					</button>
 				</div>
 			}
