@@ -30,4 +30,5 @@ export type Meal = CreateMealSchema & {
 	_id: string
 	owner: string // userId of the creator
 	rating: number | null
+	imageUrl: string | null
 }

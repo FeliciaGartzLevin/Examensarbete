@@ -8,9 +8,15 @@ import { StarRating } from './StarRating'
 import { categories } from '../../types/Meal.types'
 import Select from 'react-select'
 import { useFirebaseUpdates } from '../../hooks/useFirebaseUpdates'
+import { useWindowSize } from '../../hooks/useWindowSize'
+import { LoadingSpinner } from '../LoadingSpinner'
+import { ContentContainer } from '../generic utilities/ContentContainer'
+import { Dropzone } from './Dropzone'
 
 export const CreateMeal = () => {
 	const [starRating, setStarRating] = useState<number | null>(null)
+	const { windowSizeisLoading, windowWidth } = useWindowSize()
+	const [image, setImage] = useState<File | null>(null)
 	const {
 		loading,
 		setLoadingStatus,
@@ -19,7 +25,6 @@ export const CreateMeal = () => {
 		handleError,
 		createNewMeal
 	} = useFirebaseUpdates()
-
 	const {
 		handleSubmit,
 		register,
@@ -46,9 +51,10 @@ export const CreateMeal = () => {
 		try {
 			setLoadingStatus(true)
 
-			console.log('submitted data', data);
+			console.log('submitted data', data)
 
-			await createNewMeal(data, starRating)
+			await createNewMeal(data, starRating, image)
+
 
 		} catch (error) {
 			handleError(error)
@@ -63,8 +69,12 @@ export const CreateMeal = () => {
 		setStarRating(null)
 	}, [isSubmitSuccessful, reset])
 
+	if (windowSizeisLoading) {
+		return <LoadingSpinner />
+	}
+
 	return (
-		<>
+		<ContentContainer>
 			<h2 className='h2 mb-6'>
 				Create new dish
 			</h2>
@@ -73,10 +83,19 @@ export const CreateMeal = () => {
 				{errorMsg &&
 					<Alert body={errorMsg} color='red' />
 				}
-				<div className='mb-0'>
-					<h3 className='labelStyling mb-0'>Rating</h3>
-					<StarRating rating={starRating} onClick={(rating) => setStarRating(rating)} />
-				</div>
+				<section className='mb-4'>
+					<div className='mb-6'>
+						<h3 className='labelStyling mb-3'>Image</h3>
+						<Dropzone resetOnUpload={isSubmitSuccessful} liftImageUp={(image: File | null) => setImage(image)} />
+					</div>
+
+					<div className=''>
+						<label className="labelStyling" aria-label="name">
+							Rating
+						</label>
+						<StarRating rating={starRating} onClick={(rating) => setStarRating(rating)} />
+					</div>
+				</section>
 
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<div className="mb-4">
@@ -134,7 +153,7 @@ export const CreateMeal = () => {
 									onChange={val => onChange(val.map(c => c.value))}
 									options={options}
 									isMulti
-									blurInputOnSelect
+									blurInputOnSelect={windowWidth ? windowWidth < 640 : false}
 								/>
 							)}
 						/>
@@ -160,7 +179,7 @@ export const CreateMeal = () => {
 					</Button>
 				</form>
 			</div>
-		</>
+		</ContentContainer>
 	)
 }
 

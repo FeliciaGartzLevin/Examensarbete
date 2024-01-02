@@ -24,12 +24,25 @@
 	}
 
 	.active {
-		@apply font-semibold
+		@apply font-semibold underline underline-offset-8
 	}
 
 	.h2 {
-		@apply text-lg text-center font-bold
+		@apply text-2xl text-center font-bold
 	}
+
+	#dropzone {
+		@apply border-2 border-dashed border-gray-300 rounded-lg bg-gray-100 flex flex-col items-center p-10 cursor-pointer
+	}
+
+	#dropzone.drag-accept {
+		@apply bg-green-400 border-green-300 text-green-900
+	}
+
+	#dropzone.drag-reject {
+		@apply bg-red-400 border-red-300 text-red-900
+	}
+
 }
 
 .header-text {

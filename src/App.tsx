@@ -14,6 +14,7 @@ import { UserPreferencesPage } from "./pages/auth-routes/settings/UserPreference
 import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
 import { MealsOverView } from "./pages/auth-routes/MealsOverView"
 import { WeeksOverview } from "./pages/auth-routes/WeeksOverview"
+import { CreateMeal } from "./components/create-update-meal/CreateMeal"
 
 export const App = () => {
 	return (
@@ -71,6 +72,12 @@ export const App = () => {
 					<Route path="/weeks" element={
 						<AuthControl>
 							<WeeksOverview />
+						</AuthControl>
+					} />
+
+					<Route path="/create-meal" element={
+						<AuthControl>
+							<CreateMeal />
 						</AuthControl>
 					} />
 

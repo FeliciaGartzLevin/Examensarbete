@@ -12,7 +12,7 @@ export const createMealSchema = z
 			.nullable()
 			.refine((data) => {
 				if (data && data !== '') {
-					// Validate if it exists and if so, if it's a valid URL with regex
+					// Validate if string exists and if so checking with regex that it's a valid URL
 					return /^(http(s):\/\/.)[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/.test(data)
 				}
 				return true
