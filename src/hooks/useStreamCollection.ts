@@ -2,7 +2,7 @@ import { FirebaseError } from 'firebase/app'
 import { CollectionReference, QueryConstraint, onSnapshot, query } from 'firebase/firestore'
 import { useCallback, useEffect, useState } from 'react'
 
-const useStreamCollection = <T>(
+export const useStreamCollection = <T>(
 	colRef: CollectionReference<T>,
 	...queryConstraints: QueryConstraint[]
 ) => {
@@ -54,5 +54,3 @@ const useStreamCollection = <T>(
 		isLoading
 	}
 }
-
-export default useStreamCollection

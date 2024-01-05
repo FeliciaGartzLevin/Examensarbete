@@ -35,5 +35,4 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 // Export collection references
 export const usersCol = createCollection<UserDoc>('users')
 export const mealsCol = createCollection<Meal>('meals')
-
 // export const weeksCol = createCollection<WeekPlan>('weekplans')

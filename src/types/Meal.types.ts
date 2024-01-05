@@ -12,6 +12,8 @@ export const categories = [
 	'Fish',
 	'Beef',
 	'Pork',
+	'Soy',
+	'Tofu',
 	'Potatoes',
 	'Pasta',
 	'Rice',

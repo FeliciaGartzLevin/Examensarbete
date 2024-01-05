@@ -2,7 +2,7 @@ import { Link, Route, Routes } from "react-router-dom"
 import { Alert } from "../../../components/generic utilities/Alert"
 import { useAuthContext } from "../../../hooks/useAuthContext"
 import { ReactNode, useEffect, useState } from "react"
-import { useStreamUserPreferences } from "../../../hooks/useStreamUserPreferences"
+import { useStreamUserDoc } from "../../../hooks/useStreamUserDoc"
 import { UserDoc } from "../../../types/User.types"
 import { MealsPerDay } from "./MealsPerDay"
 import { FoodPreferences } from "./FoodPreferences"
@@ -21,7 +21,7 @@ export type QuestionsProps = {
 export const QuestionsPage = () => {
 	const { activeUser } = useAuthContext()
 	const { userName } = useAuthContext()
-	const { data: userDocs, isLoading } = useStreamUserPreferences()
+	const { data: userDocs, isLoading } = useStreamUserDoc()
 	const [showAlert, setShowAlert] = useState(true)
 
 	useEffect(() => {

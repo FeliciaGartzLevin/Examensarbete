@@ -16,7 +16,7 @@ export const SettingsPage = () => {
 					<div className="bg-black w-[2px] h-[2.5rem]"></div>
 					<NavLink to='/settings/account-settings'><p>Account settings</p></NavLink>
 				</div>
-				<Divider symbol />
+				<Divider symbol='bowl' />
 			</div>
 
 			<div className="flex justify-center w-full text-center pt-6">

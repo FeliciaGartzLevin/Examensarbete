@@ -1,5 +1,5 @@
 import { useAuthContext } from "../../../hooks/useAuthContext"
-import { useStreamUserPreferences } from "../../../hooks/useStreamUserPreferences"
+import { useStreamUserDoc } from "../../../hooks/useStreamUserDoc"
 import { MealsPerDay } from "../questions/MealsPerDay"
 import { FoodPreferences } from "../questions/FoodPreferences"
 import { DbSource } from "../questions/DbSource"
@@ -7,8 +7,7 @@ import { Divider } from "../../../components/generic utilities/Divider"
 
 export const UserPreferencesPage = () => {
 	const { activeUser } = useAuthContext()
-	const { data: userDocs, isLoading } = useStreamUserPreferences()
-
+	const { data: userDocs, isLoading } = useStreamUserDoc()
 
 	return (
 		<div className="flex flex-col gap-4 px-4">
@@ -20,7 +19,7 @@ export const UserPreferencesPage = () => {
 					activeUserId={activeUser?.uid}
 				/>
 			</div>
-			<Divider className="py-6" symbol />
+			<Divider className="py-6" symbol='bowl' />
 			<div className="flex flex-col">
 				<FoodPreferences
 					userDocs={userDocs}
@@ -28,7 +27,7 @@ export const UserPreferencesPage = () => {
 					activeUserId={activeUser?.uid}
 				/>
 			</div>
-			<Divider className="py-6" symbol />
+			<Divider className="py-6" symbol='bowl' />
 			<div>
 				<DbSource
 					userDocs={userDocs}

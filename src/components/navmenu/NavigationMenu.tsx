@@ -16,7 +16,7 @@ export const NavigationMenu = () => {
 	const menuRef = useRef<HTMLDivElement | null>(null)
 
 	const activeUserButton = (
-		<NavLink to="/settings/account-settings">
+		<NavLink to="/settings/preferences">
 			<button type='button' className="flex justify-center items-center gap-2 border-white border-2 p-2 hover:bg-white">
 				<p className="font-semibold"><FaUserShield size={23} /></p>
 				<p>{userName}</p>

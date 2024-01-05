@@ -8,7 +8,6 @@ import { Alert } from '../../../components/generic utilities/Alert'
 import { useErrorHandler } from '../../../hooks/useErrorHandler'
 import { Link } from 'react-router-dom'
 
-
 export const AccountSettingsPage = () => {
 	const { activeUser, setEmail, setDisplayName, setPassword, updateUserLocally } = useAuthContext()
 	const { errorMsg, resetError, handleError } = useErrorHandler()
