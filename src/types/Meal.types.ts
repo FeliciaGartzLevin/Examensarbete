@@ -24,7 +24,13 @@ export const categories = [
 	'Christmas',
 	'Easter',
 	'Carrots',
-	'Salad'
+	'Salad',
+	'Taco',
+	'Indian',
+	'Mexican',
+	'East Asian',
+	'Lentils',
+	'Beans'
 ] as const
 
 export type Category = typeof categories[number]
