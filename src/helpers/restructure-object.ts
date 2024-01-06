@@ -1,22 +1,21 @@
-import { UserPreferences } from "../types/User.types";
-import { LunchAndDinner } from "../types/WeekPlan.types";
+import { UserPreferences } from "../types/User.types"
+import { OneMealADay, TwoMealsADay } from "../types/WeekPlan.types"
 
 export const getMealPlanObject = (ids: string[], mealsPerDay: UserPreferences['mealsPerDay']) => {
-
 	const daysOfWeek: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-	const mealsObject: Record<string, string | null | LunchAndDinner> = {}
 
 	// set the selected meal ids for each day
-	daysOfWeek.forEach((day, index) => {
+	const mealsObject: OneMealADay | TwoMealsADay = daysOfWeek.reduce((acc, day, index) => {
 		if (mealsPerDay === 1) {
-			mealsObject[day] = ids[index] || null
+			acc[day] = ids[index] || null
 		} else {
-			mealsObject[day] = {
+			acc[day] = {
 				lunch: ids[index] || null,
 				dinner: ids[index + 1] || null,
 			}
 		}
-	})
+		return acc
+	}, {} as OneMealADay | TwoMealsADay)
 
 	return mealsObject
 }

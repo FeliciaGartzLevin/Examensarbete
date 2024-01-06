@@ -6,7 +6,7 @@ import { useErrorHandler } from "./useErrorHandler"
 import { CreateMealSchema } from "../schemas/MealSchemas"
 import { v4 } from 'uuid'
 import { getCurrentWeekNumber } from "../helpers/dates"
-import { getMealPlanObject } from "../helpers/refactor-object"
+import { getMealPlanObject } from "../helpers/restructure-object"
 
 export const useFirebaseUpdates = () => {
 	const { activeUser } = useAuthContext()
@@ -32,6 +32,7 @@ export const useFirebaseUpdates = () => {
 			owner: activeUser.uid, // userId of the creator
 			weekNumber,
 			year,
+			mealsPerDay,
 			meals: mealsObject
 		})
 	}
