@@ -1,3 +1,4 @@
+import { UserPreferences } from "./User.types"
 
 export type WeekPlan = {
 	_id: string
@@ -5,9 +6,10 @@ export type WeekPlan = {
 	weekNumber: number
 	year: number
 	meals: OneMealADay | TwoMealsADay
+	mealsPerDay: UserPreferences['mealsPerDay']
 }
 
-type OneMealADay = {
+export type OneMealADay = {
 	monday: string | null // id of the meal
 	tuesday: string | null
 	wednesday: string | null
@@ -17,7 +19,7 @@ type OneMealADay = {
 	sunday: string | null
 }
 
-type TwoMealsADay = {
+export type TwoMealsADay = {
 	monday: LunchAndDinner
 	tuesday: LunchAndDinner
 	wednesday: LunchAndDinner
@@ -27,7 +29,7 @@ type TwoMealsADay = {
 	sunday: LunchAndDinner
 }
 
-export type LunchAndDinner = {
+type LunchAndDinner = {
 	lunch: string | null // id of the meal
 	dinner: string | null
 }

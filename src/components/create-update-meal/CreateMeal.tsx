@@ -13,12 +13,13 @@ import { LoadingSpinner } from '../LoadingSpinner'
 import { ContentContainer } from '../generic utilities/ContentContainer'
 import { Dropzone } from './Dropzone'
 import { useUploadImage } from '../../hooks/useUploadImage'
+import { useSuccessAlert } from '../../hooks/useSucessAlert'
 
 export const CreateMeal = () => {
 	const [starRating, setStarRating] = useState<number | null>(null)
 	const { windowSizeisLoading, windowWidth } = useWindowSize()
 	const [image, setImage] = useState<File | null>(null)
-	const [success, setSuccess] = useState(false)
+	const { success, setSuccessState } = useSuccessAlert()
 
 	const {
 		loading,
@@ -72,7 +73,7 @@ export const CreateMeal = () => {
 	// handling when user is submitting the form
 	const onSubmit: SubmitHandler<CreateMealSchema> = async (data) => {
 		resetError()
-		setSuccess(false)
+		setSuccessState(false)
 
 		// scroll smoothly to top
 		window.scrollTo({
@@ -91,10 +92,10 @@ export const CreateMeal = () => {
 			await createNewMeal(data, starRating, url)
 
 			// show confirmation alert
-			setSuccess(true)
+			setSuccessState(true)
 		} catch (error) {
 			handleError(error)
-			setSuccess(false)
+			setSuccessState(false)
 		} finally {
 			setLoadingStatus(false)
 		}
@@ -107,17 +108,6 @@ export const CreateMeal = () => {
 		setStarRating(null)
 	}, [isSubmitSuccessful, reset])
 
-	useEffect(() => {
-		if (!success) { return }
-
-		// hide the success alert after 5 secs
-		const timeoutId = setTimeout(() => {
-			setSuccess(false)
-		}, 5000)
-
-		// Clear the timeout when the component unmounts
-		return () => clearTimeout(timeoutId)
-	}, [success])
 
 	if (windowSizeisLoading || isUploadingImage) {
 		return <LoadingSpinner />
