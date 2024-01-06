@@ -17,6 +17,7 @@ export const categories = [
 	'Potatoes',
 	'Pasta',
 	'Rice',
+	'Weekday',
 	'Weekend',
 	'Holidays',
 	'Vegetables',

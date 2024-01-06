@@ -1,7 +1,12 @@
+import { ContentContainer } from "../../components/generic utilities/ContentContainer"
 
 
 export const MealsOverView = () => {
+
 	return (
-		<div>MealsOverView</div>
+		<ContentContainer>
+			hello
+
+		</ContentContainer>
 	)
 }

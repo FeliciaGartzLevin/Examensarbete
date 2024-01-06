@@ -4,6 +4,7 @@ import { getStorage } from "firebase/storage";
 import { CollectionReference, DocumentData, collection, getFirestore } from "firebase/firestore"
 import { Meal } from "../types/Meal.types";
 import { UserDoc } from "../types/User.types";
+import { WeekPlan } from "../types/WeekPlan.types";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,4 +36,4 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 // Export collection references
 export const usersCol = createCollection<UserDoc>('users')
 export const mealsCol = createCollection<Meal>('meals')
-// export const weeksCol = createCollection<WeekPlan>('weekplans')
+export const weeksCol = createCollection<WeekPlan>('weekplans')

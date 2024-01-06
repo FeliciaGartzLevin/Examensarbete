@@ -1,40 +1,19 @@
 import { Link } from "react-router-dom"
 import { Pagination } from "../../components/Pagination"
-import { Button } from "../../components/generic utilities/Button"
 import { ContentContainer } from "../../components/generic utilities/ContentContainer"
 import { useStreamUserDoc } from "../../hooks/useStreamUserDoc"
 import { LoadingSpinner } from "../../components/LoadingSpinner"
 import { Alert } from "../../components/generic utilities/Alert"
-import { useAuthContext } from "../../hooks/useAuthContext"
 import { Divider } from "../../components/generic utilities/Divider"
-import { useEffect, useState } from "react"
-import { UserPreferences } from "../../types/User.types"
-import { GenerateMealPlan } from "../../components/GenerateMealPlan"
+import { MealPlan } from "../../components/MealPlan"
 
 export const LandingPage = () => {
-	const { activeUser } = useAuthContext()
 	const {
 		data: userDocs,
 		isLoading,
 		isError,
 		error
 	} = useStreamUserDoc()
-
-	const [mealsPerDay, setMealsPerDay] = useState<UserPreferences['mealsPerDay'] | null>(null)
-	const [foodPreferences, setfoodPreferences] = useState<UserPreferences['foodPreferences'] | null>(null)
-	const [generateFrom, setGenerateFrom] = useState<UserPreferences['generateFrom'] | null>(null)
-
-	useEffect(() => {
-		if (isLoading) { return }
-		if (!activeUser || !userDocs) { return }
-
-		// setting states from userDoc to know the preferences
-		setMealsPerDay(userDocs[0].preferences.mealsPerDay)
-		setfoodPreferences(userDocs[0].preferences.foodPreferences)
-		setGenerateFrom(userDocs[0].preferences.generateFrom)
-
-		// eslint-disable-next-line
-	}, [isLoading])
 
 	if (isLoading) {
 		return (
@@ -43,7 +22,7 @@ export const LandingPage = () => {
 	}
 
 	return (
-		<ContentContainer className="gap-6 px-12 md:px-">
+		<ContentContainer className="gap-6 px-12 md:px-20">
 			<h2 className="h2">Weekly meal plan</h2>
 			<Pagination week={45} />
 
@@ -52,7 +31,7 @@ export const LandingPage = () => {
 			}
 
 			{userDocs && userDocs[0] && !isLoading &&
-				<GenerateMealPlan userDoc={userDocs[0]} />
+				<MealPlan userDoc={userDocs[0]} />
 			}
 
 			<section className="flex flex-col items-center gap-0">
