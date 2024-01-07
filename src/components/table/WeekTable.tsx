@@ -38,14 +38,14 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 
 				<thead>
 					<tr className='bg-slate-200'>
-						<th className='p-3'>Day</th>
+						<th>Day</th>
 						{oneMeal &&
-							<th className='p-3'>Meal</th>
+							<th>Meal</th>
 						}
 						{twoMeals &&
 							<>
-								<th className='p-3'>Lunch</th>
-								<th className='p-3'>Dinner</th>
+								<th>Lunch</th>
+								<th>Dinner</th>
 							</>
 						}
 					</tr>
@@ -56,24 +56,24 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 						return (
 							<tr key={index} className='odd:bg-white even:bg-slate-100'>
 
-								{/* Always render name of */}
-								<td className='px-3 py-1'>{getWeekdayName(weekday)}</td>
+								{/* Always render name of weekday */}
+								<td>{getWeekdayName(weekday)}</td>
 
 								{/* render if oneMealPerDay*/}
 								{oneMeal &&
-									<td className='px-3 py-1'>
+									<td>
 										<Cell mealId={(weekDoc.meals as OneMealADay)[weekday as keyof WeekPlan['meals']]} />
 									</td>
 								}
 
 								{/* render if twoMealsPerDay*/}
 								{twoMeals &&
-									<td className='px-3 py-1'>
+									<td>
 										<Cell mealId={(weekDoc.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch} />
 									</td>
 								}
 								{twoMeals &&
-									<td className='pl-3 pr-1 py-1'>
+									<td>
 										<Cell mealId={(weekDoc.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner} />
 									</td>
 								}

@@ -23,6 +23,7 @@
 		@apply p-2 first-of-type:border-r-2 border-black
 	}
 
+	/* active link */
 	.active {
 		@apply font-semibold underline underline-offset-8
 	}
@@ -40,7 +41,20 @@
 	}
 
 	#dropzone.drag-reject {
-		@apply bg-red-400 border-red-300 text-red-900
+		@apply bg-red-400 border-red-300 text-red-900;
+	}
+
+	/* Table */
+	thead th {
+		@apply p-3
+	}
+
+	tbody td {
+		@apply px-3 py-2 md:py-4
+	}
+
+	tr td:last-of-type {
+		@apply pl-3 pr-1 py-1
 	}
 
 }
@@ -56,6 +70,7 @@ input#star[type="radio"] {
 	display: none;
 }
 
+/* Table */
 th:first-of-type {
 	border-top-left-radius: 1rem;
 }
