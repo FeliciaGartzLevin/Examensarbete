@@ -10,8 +10,8 @@ export const getMealPlanObject = (ids: string[], mealsPerDay: UserPreferences['m
 			acc[day] = ids[index] || null
 		} else {
 			acc[day] = {
-				lunch: ids[index] || null,
-				dinner: ids[index + 1] || null,
+				lunch: ids[index * 2] || null,
+				dinner: ids[index * 2 + 1] || null,
 			}
 		}
 		return acc

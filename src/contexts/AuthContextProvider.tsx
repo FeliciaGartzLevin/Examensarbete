@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth, usersCol } from "../services/firebase";
-import { LoadingSpinner } from "../components/LoadingSpinner";
+import { LoadingSpinner } from "../components/generic utilities/LoadingSpinner";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 type AuthContextType = {

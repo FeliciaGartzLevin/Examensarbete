@@ -14,3 +14,5 @@ export const getCurrentWeekNumber = () => {
 
 	return { weekNumber, year }
 }
+
+export const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']

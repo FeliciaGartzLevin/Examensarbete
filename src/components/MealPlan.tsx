@@ -1,83 +1,116 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../types/User.types'
 import { useStreamMealsByPreferences } from '../hooks/useStreamMealsByPreferences'
 import { Button } from './generic utilities/Button'
 import { Link } from 'react-router-dom'
-import { LoadingSpinner } from './LoadingSpinner'
+import { LoadingSpinner } from './generic utilities/LoadingSpinner'
 import { Alert } from './generic utilities/Alert'
 import { useErrorHandler } from '../hooks/useErrorHandler'
 import { useFirebaseUpdates } from '../hooks/useFirebaseUpdates'
 import shuffle from 'lodash/shuffle'
+import { WeekTable } from './table/WeekTable'
+import { useSuccessAlert } from '../hooks/useSucessAlert'
+import { FaCheck } from 'react-icons/fa6'
+import { useStreamUserWeek } from '../hooks/useStreamUserWeek'
 
 type MealPlanProps = {
 	userDoc: UserDoc
+	displayedWeek: number
+	displayedYear: number
 }
 
-export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
+export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, displayedYear }) => {
 	const { errorMsg, handleError, resetError, loading, setLoadingStatus } = useErrorHandler()
-	const [success, setSuccess] = useState(false)
+	const { success, setSuccessState } = useSuccessAlert()
 	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
+
+	// subscribing to the mealDocs that matches the user prefs
 	const {
 		data: mealsDocs,
-		isLoading,
-		isError,
-		error,
+		isLoading: isLoadingMealsDocs,
+		isError: isErrorMealsDocs,
+		error: mealsDocsError,
 	} = useStreamMealsByPreferences(
 		userDoc.preferences.generateFrom,
 		userDoc.preferences.foodPreferences.length > 0
 			? userDoc.preferences.foodPreferences
 			: null
 	)
+
+	// getting mealplan, if any, for displayed week and year
+	const {
+		data: weeksDocs,
+		isLoading: isLoadingWeeksDocs,
+		isError: isErrorWeeksDocs,
+		error: weeksDocsError,
+	} = useStreamUserWeek(displayedWeek, displayedYear)
+
 	const { createNewWeek } = useFirebaseUpdates()
 	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
 	const mealAmountTooFew = mealsDocs && mealsDocs.length < requiredMealAmount
 	const mealAmountEnough = mealsDocs && mealsDocs.length >= requiredMealAmount
-	console.log('mealsDocs', mealsDocs);
 
-	if (isLoading) {
-		return <LoadingSpinner />
-	}
+	useEffect(() => {
+		if (!weeksDocs?.length) { return }
+
+		setHasMealPlan(true)
+	}, [weeksDocs])
 
 	const shuffleFn = () => {
 		if (!mealsDocs) { return }
 
-		// shuffle all meals with fisher yates
+		// shuffle all meals
 		const shuffledMeals = shuffle([...mealsDocs])
 
-		return shuffledMeals.slice(0, requiredMealAmount).map(meal => meal._id);
-
+		// get the first requiredMealAmount from the shuffled array
+		return shuffledMeals.slice(0, requiredMealAmount).map(meal => meal._id)
 	}
 
 	const handleClickOnGenerateMealPlan = async () => {
 		resetError()
-		setSuccess(false)
+		setSuccessState(false)
 
 		try {
 			setLoadingStatus(true)
 
 			const shuffledMealIds = shuffleFn()
-			if (!shuffledMealIds) { return }
 
+			if (!shuffledMealIds) { return }
 			// creating new mealplan in firebase db
 			await createNewWeek(shuffledMealIds, userDoc.preferences.mealsPerDay)
 
 			// show confirmation alert
-			setSuccess(true)
+			setSuccessState(true)
 		} catch (error) {
 			handleError(error)
-			setSuccess(false)
+			setSuccessState(false)
 		} finally {
 			setLoadingStatus(false)
 		}
 
 	}
 
+	if (isLoadingMealsDocs) {
+		return <LoadingSpinner />
+	}
+
 	return (
 		<>
-			{/* error handling */}
-			{isError && error && <Alert color='red' header="Error" body={error} />}
-			{isError && !error && <Alert color='red' header="Error" body="An error occured" />}
+			{/* error and success handling */}
+			{isErrorMealsDocs && mealsDocsError && <Alert color='red' header="Error" body={mealsDocsError} />}
+			{isErrorMealsDocs && !mealsDocsError && <Alert color='red' header="Error" body="An error occured" />}
 			{errorMsg && <Alert color='red' header="Error" body={errorMsg} />}
+			{success && <Alert
+				color='green'
+				header="Success"
+				body={
+					<div className='flex justify-center'>
+						<div><FaCheck size={30} color={'text-green-700'} /></div>
+						<p>Mealplan was successfully created</p>
+					</div>
+				}
+			/>}
+
 
 			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
 			{!hasMealPlan &&
@@ -137,11 +170,10 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				</>
 			}
 
-
-			{/* If week has mealplan show it */}
-			{/* {hasMealPlan &&
-			<WeekTable/>
-			} */}
+			{/* If week has mealplan show it  */}
+			{hasMealPlan && weeksDocs && weeksDocs.length &&
+				<WeekTable weekDoc={weeksDocs[0]} />
+			}
 
 
 		</>

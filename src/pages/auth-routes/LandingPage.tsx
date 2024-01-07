@@ -2,18 +2,23 @@ import { Link } from "react-router-dom"
 import { Pagination } from "../../components/Pagination"
 import { ContentContainer } from "../../components/generic utilities/ContentContainer"
 import { useStreamUserDoc } from "../../hooks/useStreamUserDoc"
-import { LoadingSpinner } from "../../components/LoadingSpinner"
+import { LoadingSpinner } from "../../components/generic utilities/LoadingSpinner"
 import { Alert } from "../../components/generic utilities/Alert"
 import { Divider } from "../../components/generic utilities/Divider"
 import { MealPlan } from "../../components/MealPlan"
+import { useState } from "react"
+import { getCurrentWeekNumber } from "../../helpers/dates"
 
 export const LandingPage = () => {
+	const { weekNumber, year } = getCurrentWeekNumber()
 	const {
 		data: userDocs,
 		isLoading,
 		isError,
 		error
 	} = useStreamUserDoc()
+	const [displayedWeek, setDisplayedWeek] = useState<number>(weekNumber)
+	const [displayedYear, setDisplayedYear] = useState<number>(year)
 
 	if (isLoading) {
 		return (
@@ -31,7 +36,7 @@ export const LandingPage = () => {
 			}
 
 			{userDocs && userDocs[0] && !isLoading &&
-				<MealPlan userDoc={userDocs[0]} />
+				<MealPlan userDoc={userDocs[0]} displayedWeek={displayedWeek} displayedYear={displayedYear} />
 			}
 
 			<section className="flex flex-col items-center gap-0">
