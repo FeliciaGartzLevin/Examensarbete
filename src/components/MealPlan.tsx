@@ -24,7 +24,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 	const { success, setSuccessState } = useSuccessAlert()
 	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
 
-	// subscribing to the mealDocs that matches the user prefs
+	// streaming the mealDocs that matches the user prefs
 	const {
 		data: mealsDocs,
 		isLoading: isLoadingMealsDocs,
@@ -90,15 +90,15 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 
 	}
 
-	if (isLoadingMealsDocs) {
+	if (isLoadingMealsDocs || isLoadingWeeksDocs || loading) {
 		return <LoadingSpinner />
 	}
 
 	return (
 		<>
 			{/* error and success handling */}
-			{isErrorMealsDocs && mealsDocsError && <Alert color='red' header="Error" body={mealsDocsError} />}
-			{isErrorMealsDocs && !mealsDocsError && <Alert color='red' header="Error" body="An error occured" />}
+			{isErrorMealsDocs && mealsDocsError && <Alert color='red' header="Error" body={mealsDocsError || "An error occured"} />}
+			{isErrorWeeksDocs && weeksDocsError && <Alert color='red' header="Error" body={weeksDocsError || "An error occured"} />}
 			{errorMsg && <Alert color='red' header="Error" body={errorMsg} />}
 			{success && <Alert
 				color='green'
