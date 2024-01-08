@@ -54,7 +54,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 		if (!weeksDocs?.length) { return }
 
 		setHasMealPlan(true)
-	}, [weeksDocs])
+	}, [weeksDocs, displayedWeek])
 
 	const shuffleFn = () => {
 		if (!mealsDocs) { return }
@@ -77,7 +77,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 
 			if (!shuffledMealIds) { return }
 			// creating new mealplan in firebase db
-			await createNewWeek(shuffledMealIds, userDoc.preferences.mealsPerDay)
+			await createNewWeek(shuffledMealIds, userDoc.preferences.mealsPerDay, displayedWeek, displayedYear)
 
 			// show confirmation alert
 			setSuccessState(true)
@@ -170,7 +170,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 				</>
 			}
 
-			{/* If week has mealplan show it  */}
+			{/* If week has mealplan, show it  */}
 			{hasMealPlan && weeksDocs && weeksDocs.length &&
 				<WeekTable weekDoc={weeksDocs[0]} />
 			}

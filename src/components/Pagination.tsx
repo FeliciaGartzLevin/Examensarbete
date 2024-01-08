@@ -2,12 +2,12 @@ import React from 'react'
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 
 type PaginationProps = {
-	week: number
-	onClickBack?: React.MouseEventHandler<HTMLButtonElement> | undefined
-	onClickForward?: React.MouseEventHandler<HTMLButtonElement> | undefined
+	header: string
+	onClickBack: () => void
+	onClickForward: () => void
 }
 
-export const Pagination: React.FC<PaginationProps> = ({ week, onClickBack, onClickForward }) => {
+export const Pagination: React.FC<PaginationProps> = ({ header, onClickBack, onClickForward }) => {
 	return (
 		<div className='flex justify-between w-[80%] lg:w-[60%] xl:w-[40%]'>
 			<button
@@ -17,7 +17,7 @@ export const Pagination: React.FC<PaginationProps> = ({ week, onClickBack, onCli
 			>
 				<FaArrowLeftLong size={23} />
 			</button>
-			<p>Week {week}</p>
+			<p>{header}</p>
 			<button
 				type='button'
 				title='back'

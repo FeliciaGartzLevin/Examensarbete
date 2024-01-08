@@ -41,8 +41,6 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 		error: mealsDocsError,
 	} = useStreamMealsByIds(getMealIds())
 
-	console.log('mealsDocs', mealsDocs)
-
 	const getWeekdayName = (weekday: string) => {
 		const wkdnLong = weekday.charAt(0).toUpperCase() + weekday.slice(1)
 		const wkdnShort = wkdnLong.slice(0, 2)

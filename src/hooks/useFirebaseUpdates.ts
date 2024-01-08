@@ -5,21 +5,20 @@ import { UserPreferences } from "../types/User.types"
 import { useErrorHandler } from "./useErrorHandler"
 import { CreateMealSchema } from "../schemas/MealSchemas"
 import { v4 } from 'uuid'
-import { getCurrentWeekNumber } from "../helpers/dates"
 import { getMealPlanObject } from "../helpers/restructure-object"
+import { findLastWeekOfTheYear } from "../helpers/dates"
 
 export const useFirebaseUpdates = () => {
 	const { activeUser } = useAuthContext()
 	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
 
-	const createNewWeek = (mealIds: string[], mealsPerDay: UserPreferences['mealsPerDay']) => {
+	const createNewWeek = (mealIds: string[], mealsPerDay: UserPreferences['mealsPerDay'], weekNumber: number, year: number) => {
 		if (!activeUser) { throw new Error("No active user") }
+		const lastweekOfTheYear = findLastWeekOfTheYear(year)
+		if (weekNumber > lastweekOfTheYear) { throw new Error("That week doesn't exist") }
 
 		// create uuid
 		const _id = v4()
-
-		// getting current week and year
-		const { weekNumber, year } = getCurrentWeekNumber()
 
 		const mealsObject = getMealPlanObject(mealIds, mealsPerDay)
 
@@ -33,7 +32,7 @@ export const useFirebaseUpdates = () => {
 			weekNumber,
 			year,
 			mealsPerDay,
-			meals: mealsObject
+			meals: mealsObject,
 		})
 	}
 
