@@ -25,7 +25,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { errorMsg, handleError, resetError, loading, setLoadingStatus } = useErrorHandler()
 	const { success, setSuccessState } = useSuccessAlert()
 	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
-	const [searchParams,] = useSearchParams()
+	const [searchParams, setSearchParams] = useSearchParams()
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))
 	const { activeUser } = useAuthContext()
@@ -53,6 +53,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		isLoading: isLoadingWeeksDocs,
 		isError: isErrorWeeksDocs,
 		error: weeksDocsError,
+		refetch: refetchWeekDocs,
 	} = useQuery({
 		queryKey: ["weekPlan", { week: displayedWeek, year: displayedYear }], // add year also
 		queryFn: () => fetchFirebaseDocs<WeekPlan>(
@@ -101,6 +102,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 			// show confirmation alert
 			setSuccessState(true)
+
+			refetchWeekDocs()
 		} catch (error) {
 			handleError(error)
 			setSuccessState(false)
@@ -130,6 +133,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 					</div>
 				}
 			/>}
+
 
 			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
 			{!hasMealPlan &&
@@ -193,7 +197,6 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			{hasMealPlan && weeksDocs && weeksDocs.length &&
 				<WeekTable weekDoc={weeksDocs[0]} />
 			}
-
 
 		</>
 
