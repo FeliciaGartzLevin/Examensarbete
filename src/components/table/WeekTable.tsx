@@ -3,7 +3,7 @@ import { OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../generic utilities/LoadingSpinner'
 import { weekdays } from '../../helpers/dates'
-import { useStreamMealsByIds } from '../../hooks/useStreamMealsByIds'
+import { useStreamMealsByIds } from '../../hooks/firebase/useStreamMealsByIds'
 import { Alert } from '../generic utilities/Alert'
 import { LuUtensilsCrossed } from 'react-icons/lu'
 

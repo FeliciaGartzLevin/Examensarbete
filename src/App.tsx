@@ -15,6 +15,7 @@ import { QuestionsPage } from "./pages/auth-routes/questions/QuestionsPage"
 import { MealsOverView } from "./pages/auth-routes/MealsOverView"
 import { WeeksOverview } from "./pages/auth-routes/WeeksOverview"
 import { CreateMeal } from "./components/create-update-meal/CreateMeal"
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export const App = () => {
 	return (
@@ -82,6 +83,7 @@ export const App = () => {
 					} />
 
 				</Routes>
+				<ReactQueryDevtools initialIsOpen={false} />
 			</div>
 
 		</div>

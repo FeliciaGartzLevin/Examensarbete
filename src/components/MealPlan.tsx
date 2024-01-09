@@ -1,28 +1,34 @@
 import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../types/User.types'
-import { useStreamMealsByPreferences } from '../hooks/useStreamMealsByPreferences'
+import { useStreamMealsByPreferences } from '../hooks/firebase/useStreamMealsByPreferences'
 import { Button } from './generic utilities/Button'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from './generic utilities/LoadingSpinner'
 import { Alert } from './generic utilities/Alert'
 import { useErrorHandler } from '../hooks/useErrorHandler'
-import { useFirebaseUpdates } from '../hooks/useFirebaseUpdates'
+import { useFirebaseUpdates } from '../hooks/firebase/useFirebaseUpdates'
 import shuffle from 'lodash/shuffle'
 import { WeekTable } from './table/WeekTable'
 import { useSuccessAlert } from '../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
-import { useStreamUserWeek } from '../hooks/useStreamUserWeek'
+import { fetchFirebaseDocs, weeksCol } from '../services/firebase'
+import { where } from 'firebase/firestore'
+import { WeekPlan } from '../types/WeekPlan.types'
+import { useAuthContext } from '../hooks/useAuthContext'
+import { useQuery } from '@tanstack/react-query'
 
 type MealPlanProps = {
 	userDoc: UserDoc
-	displayedWeek: number
-	displayedYear: number
 }
 
-export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, displayedYear }) => {
+export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { errorMsg, handleError, resetError, loading, setLoadingStatus } = useErrorHandler()
 	const { success, setSuccessState } = useSuccessAlert()
 	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
+	const [searchParams,] = useSearchParams()
+	const displayedWeek = Number(searchParams.get("week"))
+	const displayedYear = Number(searchParams.get("year"))
+	const { activeUser } = useAuthContext()
 
 	// streaming the mealDocs that matches the user prefs
 	const {
@@ -37,21 +43,35 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 			: null
 	)
 
-	// getting mealplan, if any, for displayed week and year
+	const { createNewWeek } = useFirebaseUpdates()
+	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
+	const mealAmountTooFew = mealsDocs && mealsDocs.length < requiredMealAmount
+	const mealAmountEnough = mealsDocs && mealsDocs.length >= requiredMealAmount
+	if (!activeUser) { throw new Error("No active user") }
 	const {
 		data: weeksDocs,
 		isLoading: isLoadingWeeksDocs,
 		isError: isErrorWeeksDocs,
 		error: weeksDocsError,
-	} = useStreamUserWeek(displayedWeek, displayedYear)
+	} = useQuery({
+		queryKey: ["weekPlan", { week: displayedWeek, year: displayedYear }], // add year also
+		queryFn: () => fetchFirebaseDocs<WeekPlan>(
+			weeksCol,
+			[
+				where('owner', '==', activeUser.uid),
+				where('weekNumber', '==', displayedWeek),
+				where('year', '==', displayedYear),
+			]
+		)
+	})
 
-	const { createNewWeek } = useFirebaseUpdates()
-	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
-	const mealAmountTooFew = mealsDocs && mealsDocs.length < requiredMealAmount
-	const mealAmountEnough = mealsDocs && mealsDocs.length >= requiredMealAmount
+	console.log('weeksDocs', weeksDocs);
 
 	useEffect(() => {
-		if (!weeksDocs?.length) { return }
+		if (!weeksDocs?.length) {
+			setHasMealPlan(false)
+			return
+		}
 
 		setHasMealPlan(true)
 	}, [weeksDocs, displayedWeek])
@@ -98,7 +118,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 		<>
 			{/* error and success handling */}
 			{isErrorMealsDocs && mealsDocsError && <Alert color='red' header="Error" body={mealsDocsError || "An error occured"} />}
-			{isErrorWeeksDocs && weeksDocsError && <Alert color='red' header="Error" body={weeksDocsError || "An error occured"} />}
+			{isErrorWeeksDocs && weeksDocsError && <Alert color='red' header="Error" body={weeksDocsError.message || "An error occured"} />}
 			{errorMsg && <Alert color='red' header="Error" body={errorMsg} />}
 			{success && <Alert
 				color='green'
@@ -110,7 +130,6 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc, displayedWeek, disp
 					</div>
 				}
 			/>}
-
 
 			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
 			{!hasMealPlan &&

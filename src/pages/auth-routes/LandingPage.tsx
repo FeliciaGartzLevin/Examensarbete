@@ -1,7 +1,7 @@
 import { Link, useSearchParams, useNavigate } from "react-router-dom"
 import { Pagination } from "../../components/Pagination"
 import { ContentContainer } from "../../components/generic utilities/ContentContainer"
-import { useStreamUserDoc } from "../../hooks/useStreamUserDoc"
+import { useStreamUserDoc } from "../../hooks/firebase/useStreamUserDoc"
 import { LoadingSpinner } from "../../components/generic utilities/LoadingSpinner"
 import { Alert } from "../../components/generic utilities/Alert"
 import { Divider } from "../../components/generic utilities/Divider"
@@ -14,6 +14,7 @@ export const LandingPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const thisWeek = Number(searchParams.get("week"))
 	const thisYear = Number(searchParams.get("year"))
+
 	const {
 		data: userDocs,
 		isLoading,
@@ -100,7 +101,7 @@ export const LandingPage = () => {
 			}
 
 			{userDocs && userDocs[0] && !isLoading &&
-				<MealPlan userDoc={userDocs[0]} displayedWeek={Number(searchParams.get("week"))} displayedYear={Number(searchParams.get("year"))} />
+				<MealPlan userDoc={userDocs[0]} />
 			}
 
 			<section className="flex flex-col items-center gap-0">
