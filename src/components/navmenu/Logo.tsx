@@ -15,12 +15,12 @@ export const Logo: React.FC<LogoProps> = ({ text, link }) => {
 				<div className='bg-white rounded-full p-2'>
 					<PiBowlFoodDuotone
 						size={40}
-						alt='Meal Planner logo'
+						alt='Meal Plan Helper logo'
 					/>
 				</div>
 				{text &&
 					<p className='hidden md:block'>
-						Meal Planner
+						Meal Plan Helper
 					</p>
 				}
 			</div>
