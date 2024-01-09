@@ -1,10 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import { CollectionReference, DocumentData, collection, getFirestore } from "firebase/firestore"
-import { Meal } from "../types/Meal.types";
-import { UserDoc } from "../types/User.types";
-import { WeekPlan } from "../types/WeekPlan.types";
+import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
+import { getStorage } from "firebase/storage"
+import { CollectionReference, DocumentData, QueryConstraint, collection, getDocs, getFirestore, query } from "firebase/firestore"
+import { Meal } from "../types/Meal.types"
+import { UserDoc } from "../types/User.types"
+import { WeekPlan } from "../types/WeekPlan.types"
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,10 +14,10 @@ const firebaseConfig = {
 	storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
 	messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
 	appId: import.meta.env.VITE_FIREBASE_APP_ID
-};
+}
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig)
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app)
@@ -37,3 +37,23 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const usersCol = createCollection<UserDoc>('users')
 export const mealsCol = createCollection<Meal>('meals')
 export const weeksCol = createCollection<WeekPlan>('weekplans')
+
+// A controlled generic fetch on the contrary to the useStreamCollection-hook
+export const fetchFirebaseDocs = async <T>(
+	colRef: CollectionReference<T>,
+	queryConstraints: QueryConstraint[]
+) => {
+	const queryRef = query(colRef, ...queryConstraints)
+	console.log('fetching from firebaseDocs with queryConstraints', queryConstraints);
+
+	const snapshot = await getDocs(queryRef)
+	const data: T[] = snapshot.docs.map(doc => ({
+		...doc.data(),
+		_id: doc.id
+	}))
+	console.log('data', data);
+
+
+	return data
+
+}
