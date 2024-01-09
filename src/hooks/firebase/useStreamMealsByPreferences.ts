@@ -1,9 +1,9 @@
 import { useStreamCollection } from './useStreamCollection'
-import { mealsCol } from '../services/firebase'
-import { Meal } from '../types/Meal.types'
-import { UserPreferences } from '../types/User.types'
+import { mealsCol } from '../../services/firebase'
+import { Meal } from '../../types/Meal.types'
+import { UserPreferences } from '../../types/User.types'
 import { QueryConstraint, where } from 'firebase/firestore'
-import { useAuthContext } from './useAuthContext'
+import { useAuthContext } from '../useAuthContext'
 import { compact } from 'lodash'
 
 export const useStreamMealsByPreferences = (

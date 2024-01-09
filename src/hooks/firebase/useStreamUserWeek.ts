@@ -1,8 +1,8 @@
 import { useStreamCollection } from './useStreamCollection'
-import { weeksCol } from '../services/firebase'
+import { weeksCol } from '../../services/firebase'
 import { where } from 'firebase/firestore'
-import { useAuthContext } from './useAuthContext'
-import { WeekPlan } from '../types/WeekPlan.types'
+import { useAuthContext } from '../useAuthContext'
+import { WeekPlan } from '../../types/WeekPlan.types'
 
 export const useStreamUserWeek = (displayedWeek: number, displayedYear: number) => {
 	const { activeUser } = useAuthContext()

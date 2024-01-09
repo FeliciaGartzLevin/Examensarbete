@@ -1,5 +1,5 @@
 import { useAuthContext } from "../../../hooks/useAuthContext"
-import { useStreamUserDoc } from "../../../hooks/useStreamUserDoc"
+import { useStreamUserDoc } from "../../../hooks/firebase/useStreamUserDoc"
 import { MealsPerDay } from "../questions/MealsPerDay"
 import { FoodPreferences } from "../questions/FoodPreferences"
 import { DbSource } from "../questions/DbSource"

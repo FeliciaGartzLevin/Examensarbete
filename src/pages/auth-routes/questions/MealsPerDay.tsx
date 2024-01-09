@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Pill } from "../../../components/generic utilities/Pill"
 import { UserPreferences } from "../../../types/User.types";
 import { Alert } from "../../../components/generic utilities/Alert";
-import { useFirebaseUpdates } from "../../../hooks/useFirebaseUpdates";
+import { useFirebaseUpdates } from "../../../hooks/firebase/useFirebaseUpdates";
 import { QuestionsProps } from "./QuestionsPage";
 import { extractPreferences } from "../../../helpers/questionHelpers";
 

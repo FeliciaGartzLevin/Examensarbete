@@ -1,12 +1,12 @@
 import { doc, setDoc } from "firebase/firestore"
-import { mealsCol, usersCol, weeksCol } from "../services/firebase"
-import { useAuthContext } from "./useAuthContext"
-import { UserPreferences } from "../types/User.types"
-import { useErrorHandler } from "./useErrorHandler"
-import { CreateMealSchema } from "../schemas/MealSchemas"
+import { mealsCol, usersCol, weeksCol } from "../../services/firebase"
+import { useAuthContext } from "../useAuthContext"
+import { UserPreferences } from "../../types/User.types"
+import { useErrorHandler } from "../useErrorHandler"
+import { CreateMealSchema } from "../../schemas/MealSchemas"
 import { v4 } from 'uuid'
-import { getMealPlanObject } from "../helpers/restructure-object"
-import { findLastWeekOfTheYear } from "../helpers/dates"
+import { getMealPlanObject } from "../../helpers/restructure-object"
+import { findLastWeekOfTheYear } from "../../helpers/dates"
 
 export const useFirebaseUpdates = () => {
 	const { activeUser } = useAuthContext()
