@@ -39,7 +39,7 @@ export const SignInPage = () => {
 		<div className="h-full flex justify-center items-center">
 			<div className="w-full max-w-xs">
 				<form onSubmit={handleSubmit(onSubmit)} className="bg-light-background shadow-2xl rounded px-8 pt-6 pb-8 mb-4">
-					<h2 className='text-lg text-center font-bold mb-1'>
+					<h2 className='text-lg text-center font-bold mb-4'>
 						Sign in
 					</h2>
 
@@ -82,7 +82,7 @@ export const SignInPage = () => {
 								: 'Sign in'}
 						</Button>
 					</div>
-					<Divider symbol />
+					<Divider symbol='bowl' className='py-4' />
 					<div className="text-center text-gray-500 text-xs">
 						<p>Don't have an account?</p>
 						<p>

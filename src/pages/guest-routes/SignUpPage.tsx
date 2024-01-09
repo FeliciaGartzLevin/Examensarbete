@@ -119,7 +119,7 @@ export const SignUpPage = () => {
 								)}
 						</Button>
 					</div>
-					<Divider symbol />
+					<Divider symbol='bowl' />
 					<div className="text-center text-gray-500 text-xs">
 						<p>Do you already have an account?</p>
 						<p>
