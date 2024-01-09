@@ -3,9 +3,13 @@ import { OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../generic utilities/LoadingSpinner'
 import { weekdays } from '../../helpers/dates'
-import { useStreamMealsByIds } from '../../hooks/firebase/useStreamMealsByIds'
 import { Alert } from '../generic utilities/Alert'
 import { LuUtensilsCrossed } from 'react-icons/lu'
+import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
+import { fetchFirebaseDocs, mealsCol } from '../../services/firebase'
+import { Meal } from '../../types/Meal.types'
+import { where } from 'firebase/firestore'
 
 type WeekTableProps = {
 	weekDoc: WeekPlan
@@ -16,6 +20,9 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 	const weekArr = weekdays
 	const oneMeal = weekDoc.mealsPerDay === 1
 	const twoMeals = weekDoc.mealsPerDay === 2
+	const [searchParams,] = useSearchParams()
+	const displayedWeek = Number(searchParams.get("week"))
+	const displayedYear = Number(searchParams.get("year"))
 	const getMealIds = () => {
 		const mealIdsArr: Array<string | null> = []
 
@@ -39,7 +46,17 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 		isLoading: isLoadingMealsDocs,
 		isError: isErrorMealsDocs,
 		error: mealsDocsError,
-	} = useStreamMealsByIds(getMealIds())
+	} = useQuery({
+		queryKey: ["weekPlanMeals", { week: displayedWeek, year: displayedYear }],
+		queryFn: () => fetchFirebaseDocs<Meal>(
+			mealsCol,
+			[where('_id', 'in', getMealIds())]
+		)
+	})
+	// useStreamMealsByIds(getMealIds())
+
+	console.log('mealsDocs', mealsDocs);
+
 
 	const getWeekdayName = (weekday: string) => {
 		const wkdnLong = weekday.charAt(0).toUpperCase() + weekday.slice(1)
@@ -73,7 +90,7 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 				<table className="table-auto text-left relative">
 					{isErrorMealsDocs && mealsDocsError &&
 						<div className='absolute w-full h-full flex justify-center items-center'>
-							<Alert color='red' header="Error" body={mealsDocsError || "An error occured fetching meals"} />
+							<Alert color='red' header={mealsDocsError.name || "Error"} body={mealsDocsError.message || "An error occured fetching meals"} />
 						</div>
 					}
 

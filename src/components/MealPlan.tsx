@@ -25,12 +25,13 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { errorMsg, handleError, resetError, loading, setLoadingStatus } = useErrorHandler()
 	const { success, setSuccessState } = useSuccessAlert()
 	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
-	const [searchParams, setSearchParams] = useSearchParams()
+	const [searchParams,] = useSearchParams()
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))
 	const { activeUser } = useAuthContext()
 
 	// streaming the mealDocs that matches the user prefs
+	// ändra detta då dessa bara behövs hämtas om det inte finns weeksDocs
 	const {
 		data: mealsDocs,
 		isLoading: isLoadingMealsDocs,
@@ -63,7 +64,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				where('weekNumber', '==', displayedWeek),
 				where('year', '==', displayedYear),
 			]
-		)
+		),
+		enabled: !!mealsDocs,
 	})
 
 	console.log('weeksDocs', weeksDocs);
