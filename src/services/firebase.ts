@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { getStorage } from "firebase/storage"
-import { CollectionReference, DocumentData, QueryConstraint, collection, getDocs, getFirestore, query } from "firebase/firestore"
+import { CollectionReference, DocumentData, QueryConstraint, collection, getCountFromServer, getDocs, getFirestore, query } from "firebase/firestore"
 import { Meal } from "../types/Meal.types"
 import { UserDoc } from "../types/User.types"
 import { WeekPlan } from "../types/WeekPlan.types"
@@ -41,19 +41,22 @@ export const weeksCol = createCollection<WeekPlan>('weekplans')
 // A controlled generic fetch on the contrary to the useStreamCollection-hook
 export const fetchFirebaseDocs = async <T>(
 	colRef: CollectionReference<T>,
-	queryConstraints: QueryConstraint[]
+	queryConstraints: QueryConstraint[],
 ) => {
 	const queryRef = query(colRef, ...queryConstraints)
-	console.log('fetching from firebaseDocs with queryConstraints', queryConstraints);
 
 	const snapshot = await getDocs(queryRef)
 	const data: T[] = snapshot.docs.map(doc => ({
 		...doc.data(),
 		_id: doc.id
 	}))
-	console.log('data', data);
-
 
 	return data
 
+}
+
+//getting the lenght of a collection
+export const getCollectionLength = async <T>(colRef: CollectionReference<T>) => {
+	const snapshot = await getCountFromServer(colRef)
+	return snapshot
 }

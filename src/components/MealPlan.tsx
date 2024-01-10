@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { UserDoc } from '../types/User.types'
-import { useStreamMealsByPreferences } from '../hooks/firebase/useStreamMealsByPreferences'
 import { Button } from './generic utilities/Button'
 import { Link, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from './generic utilities/LoadingSpinner'
@@ -11,11 +10,13 @@ import shuffle from 'lodash/shuffle'
 import { WeekTable } from './table/WeekTable'
 import { useSuccessAlert } from '../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
-import { fetchFirebaseDocs, weeksCol } from '../services/firebase'
+import { fetchFirebaseDocs, getCollectionLength, mealsCol, weeksCol } from '../services/firebase'
 import { where } from 'firebase/firestore'
 import { WeekPlan } from '../types/WeekPlan.types'
 import { useAuthContext } from '../hooks/useAuthContext'
 import { useQuery } from '@tanstack/react-query'
+import { Meal } from '../types/Meal.types'
+import { compact } from 'lodash'
 
 type MealPlanProps = {
 	userDoc: UserDoc
@@ -24,39 +25,22 @@ type MealPlanProps = {
 export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { errorMsg, handleError, resetError, loading, setLoadingStatus } = useErrorHandler()
 	const { success, setSuccessState } = useSuccessAlert()
-	const [hasMealPlan, setHasMealPlan] = useState<boolean>(false)
 	const [searchParams,] = useSearchParams()
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))
 	const { activeUser } = useAuthContext()
 
-	// streaming the mealDocs that matches the user prefs
-	// ändra detta då dessa bara behövs hämtas om det inte finns weeksDocs
-	const {
-		data: mealsDocs,
-		isLoading: isLoadingMealsDocs,
-		isError: isErrorMealsDocs,
-		error: mealsDocsError,
-	} = useStreamMealsByPreferences(
-		userDoc.preferences.generateFrom,
-		userDoc.preferences.foodPreferences.length > 0
-			? userDoc.preferences.foodPreferences
-			: null
-	)
-
-	const { createNewWeek } = useFirebaseUpdates()
-	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
-	const mealAmountTooFew = mealsDocs && mealsDocs.length < requiredMealAmount
-	const mealAmountEnough = mealsDocs && mealsDocs.length >= requiredMealAmount
 	if (!activeUser) { throw new Error("No active user") }
+
 	const {
 		data: weeksDocs,
 		isLoading: isLoadingWeeksDocs,
 		isError: isErrorWeeksDocs,
 		error: weeksDocsError,
+		isSuccess: weekDocsIsSuccess,
 		refetch: refetchWeekDocs,
 	} = useQuery({
-		queryKey: ["weekPlan", { week: displayedWeek, year: displayedYear }], // add year also
+		queryKey: ["weekPlan", { week: displayedWeek, year: displayedYear }],
 		queryFn: () => fetchFirebaseDocs<WeekPlan>(
 			weeksCol,
 			[
@@ -65,21 +49,47 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				where('year', '==', displayedYear),
 			]
 		),
-		enabled: !!mealsDocs,
 	})
 
-	console.log('weeksDocs', weeksDocs);
+	const generateMealsQueries = () => {
+		// if generateFrom === "ownDishes", query only meals that active user are owner to, otherwise no query (will fetch all dishes)
+		const generateFromFilter = userDoc.preferences.generateFrom === "ownDishes"
+			? where("owner", "==", activeUser.uid)
+			: null
 
-	useEffect(() => {
-		if (!weeksDocs?.length) {
-			setHasMealPlan(false)
-			return
+		let prefFilter = null
+		if (userDoc.preferences.foodPreferences.length > 0) {
+			// if foodPreferences exists: query on them, otherwise no query, just get all meals
+			prefFilter = where("category", "array-contains-any", [userDoc.preferences.foodPreferences])
 		}
 
-		setHasMealPlan(true)
-	}, [weeksDocs, displayedWeek])
+		// compact = lodash function that removes all falsy values since QueryConstraint[] don't accept such
+		return compact([
+			prefFilter,
+			generateFromFilter
+		])
+	}
 
-	const shuffleFn = () => {
+	// fetching the mealDocs that matches the user prefs
+	const {
+		data: mealsDocsLenght,
+		isLoading: isLoadingMealsDocsLenght,
+		isError: isErrorMealsDocsLenght,
+		error: mealsDocsLenghtError,
+	} = useQuery({
+		queryKey: ["Length of meals collection"],
+		queryFn: () => getCollectionLength<Meal>(mealsCol),
+		enabled: weekDocsIsSuccess
+			// don't fetch mealDocs lenght unnecessarily. it is not needed if weekDocs already exists
+			&& !(weeksDocs?.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear))
+	})
+	const { createNewWeek } = useFirebaseUpdates()
+	const mealsDocsLenghtData = mealsDocsLenght?.data().count
+	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
+	const mealAmountTooFew = mealsDocsLenghtData && mealsDocsLenghtData < requiredMealAmount
+	const mealAmountEnough = mealsDocsLenghtData && mealsDocsLenghtData >= requiredMealAmount
+
+	const shuffleFn = (mealsDocs: Meal[]) => {
 		if (!mealsDocs) { return }
 
 		// shuffle all meals
@@ -89,14 +99,24 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		return shuffledMeals.slice(0, requiredMealAmount).map(meal => meal._id)
 	}
 
+
 	const handleClickOnGenerateMealPlan = async () => {
 		resetError()
 		setSuccessState(false)
 
+
+
 		try {
 			setLoadingStatus(true)
 
-			const shuffledMealIds = shuffleFn()
+			const mealsArr = await fetchFirebaseDocs<Meal>(
+				mealsCol,
+				generateMealsQueries()
+			)
+			console.log('mealsArr', mealsArr)
+
+
+			const shuffledMealIds = shuffleFn(mealsArr)
 
 			if (!shuffledMealIds) { return }
 			// creating new mealplan in firebase db
@@ -104,8 +124,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 			// show confirmation alert
 			setSuccessState(true)
-
 			refetchWeekDocs()
+
 		} catch (error) {
 			handleError(error)
 			setSuccessState(false)
@@ -115,30 +135,29 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 	}
 
-	if (isLoadingMealsDocs || isLoadingWeeksDocs || loading) {
+	if (isLoadingMealsDocsLenght || isLoadingWeeksDocs || loading) {
 		return <LoadingSpinner />
 	}
 
 	return (
 		<>
 			{/* error and success handling */}
-			{isErrorMealsDocs && mealsDocsError && <Alert color='red' header="Error" body={mealsDocsError || "An error occured"} />}
-			{isErrorWeeksDocs && weeksDocsError && <Alert color='red' header="Error" body={weeksDocsError.message || "An error occured"} />}
+			{isErrorMealsDocsLenght && mealsDocsLenghtError && <Alert color='red' header={mealsDocsLenghtError.name || "Error"} body={mealsDocsLenghtError.message || "An error occured"} />}
+			{isErrorWeeksDocs && weeksDocsError && <Alert color='red' header={weeksDocsError.name || "Error"} body={weeksDocsError.message || "An error occured"} />}
 			{errorMsg && <Alert color='red' header="Error" body={errorMsg} />}
 			{success && <Alert
 				color='green'
 				header="Success"
 				body={
-					<div className='flex justify-center'>
+					<div className='flex justify-center items-center gap-2'>
 						<div><FaCheck size={30} color={'text-green-700'} /></div>
 						<p>Mealplan was successfully created</p>
 					</div>
 				}
 			/>}
 
-
 			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
-			{!hasMealPlan &&
+			{!weeksDocs?.length &&
 				<>
 					{mealAmountTooFew &&
 						<section className="flex flex-col items-center gap-4 sm:px-14 md:px-20 lg:px-60">
@@ -149,7 +168,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 							{mealAmountTooFew && (
 								<p className='text-sm text-gray-500'>
 									You need to add {' '}
-									<span className='text-base'>{requiredMealAmount - mealsDocs.length}</span>{' '}
+									<span className='text-base'>{requiredMealAmount - mealsDocsLenghtData}</span>{' '}
 									more meals to the database
 									{userDoc.preferences.mealsPerDay === 2
 										? (
@@ -196,9 +215,13 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			}
 
 			{/* If week has mealplan, show it  */}
-			{hasMealPlan && weeksDocs && weeksDocs.length &&
-				<WeekTable weekDoc={weeksDocs[0]} />
+			{weekDocsIsSuccess
+				&& weeksDocs.length > 0
+				&& weeksDocs.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear)
+				&&
+				<WeekTable weekDoc={weeksDocs.find((week) => week.weekNumber === displayedWeek && week.year === displayedYear)} />
 			}
+
 
 		</>
 

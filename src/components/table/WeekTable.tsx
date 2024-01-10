@@ -12,14 +12,14 @@ import { Meal } from '../../types/Meal.types'
 import { where } from 'firebase/firestore'
 
 type WeekTableProps = {
-	weekDoc: WeekPlan
+	weekDoc: WeekPlan | undefined
 }
 
 export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const weekArr = weekdays
-	const oneMeal = weekDoc.mealsPerDay === 1
-	const twoMeals = weekDoc.mealsPerDay === 2
+	const oneMeal = weekDoc?.mealsPerDay === 1
+	const twoMeals = weekDoc?.mealsPerDay === 2
 	const [searchParams,] = useSearchParams()
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))
@@ -53,10 +53,6 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 			[where('_id', 'in', getMealIds())]
 		)
 	})
-	// useStreamMealsByIds(getMealIds())
-
-	console.log('mealsDocs', mealsDocs);
-
 
 	const getWeekdayName = (weekday: string) => {
 		const wkdnLong = weekday.charAt(0).toUpperCase() + weekday.slice(1)
