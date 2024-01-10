@@ -29,7 +29,6 @@ export const createMealSchema = z
 			),
 		description: z
 			.string()
-			.trim()
 			.max(1000, "The description can be max 1000 words")
 			.nullable()
 	})
