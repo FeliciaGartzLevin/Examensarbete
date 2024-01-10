@@ -1,4 +1,4 @@
-import { ContentContainer } from "../../components/generic utilities/ContentContainer"
+import { ContentContainer } from "../../components/generic-utilities/ContentContainer"
 
 export const NotFoundPage = () => {
 	return (

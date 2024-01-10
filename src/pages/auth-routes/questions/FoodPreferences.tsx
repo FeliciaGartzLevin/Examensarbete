@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Pill } from "../../../components/generic utilities/Pill"
-import { Alert } from "../../../components/generic utilities/Alert";
+import { Pill } from "../../../components/generic-utilities/Pill"
+import { Alert } from "../../../components/generic-utilities/Alert";
 import { useFirebaseUpdates } from "../../../hooks/firebase/useFirebaseUpdates";
 import { Preference } from "../../../types/Meal.types";
 import { QuestionsProps } from "./QuestionsPage";

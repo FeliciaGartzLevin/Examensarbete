@@ -3,12 +3,12 @@ import { Link, useParams } from "react-router-dom"
 import { fetchFirebaseDocs, mealsCol } from "../../services/firebase"
 import { Meal } from "../../types/Meal.types"
 import { where } from "firebase/firestore"
-import { ContentContainer } from "../../components/generic utilities/ContentContainer"
-import { LoadingSpinner } from "../../components/generic utilities/LoadingSpinner"
-import { Alert } from "../../components/generic utilities/Alert"
+import { ContentContainer } from "../../components/generic-utilities/ContentContainer"
+import { LoadingSpinner } from "../../components/generic-utilities/LoadingSpinner"
+import { Alert } from "../../components/generic-utilities/Alert"
 import { FaStar } from "react-icons/fa6";
 import { BsGlobe } from "react-icons/bs";
-import { Button } from "../../components/generic utilities/Button"
+import { Button } from "../../components/generic-utilities/Button"
 
 export const MealDetails = () => {
 	const { mealId } = useParams()

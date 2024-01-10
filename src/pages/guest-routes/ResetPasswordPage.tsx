@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Button } from '../../components/generic utilities/Button'
+import { Button } from '../../components/generic-utilities/Button'
 import { ResetPasswordSchema, resetPasswordSchema } from '../../schemas/AuthSchemas'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { useEffect, useState } from 'react'
-import { Alert } from '../../components/generic utilities/Alert'
+import { Alert } from '../../components/generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
 
 export const ResetPasswordPage = () => {

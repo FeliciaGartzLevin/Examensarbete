@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { Alert } from "../../components/generic utilities/Alert"
+import { Alert } from "../../components/generic-utilities/Alert"
 import { useAuthContext } from "../../hooks/useAuthContext"
 import { useEffect } from "react"
 

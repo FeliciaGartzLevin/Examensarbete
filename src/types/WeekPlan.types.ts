@@ -29,7 +29,7 @@ export type TwoMealsADay = {
 	sunday: LunchAndDinner
 }
 
-type LunchAndDinner = {
+export type LunchAndDinner = {
 	lunch: string | null // id of the meal
 	dinner: string | null
 }

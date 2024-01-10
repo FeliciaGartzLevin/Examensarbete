@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '../../components/generic utilities/Button'
+import { Button } from '../../components/generic-utilities/Button'
 import { SignUpSchema, signUpSchema } from '../../schemas/AuthSchemas'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { useState } from 'react'
-import { Alert } from '../../components/generic utilities/Alert'
+import { Alert } from '../../components/generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
-import { Divider } from '../../components/generic utilities/Divider'
+import { Divider } from '../../components/generic-utilities/Divider'
 import { TbUserPlus } from "react-icons/tb";
 
 export const SignUpPage = () => {

@@ -1,21 +1,21 @@
 import React from 'react'
-import { UserDoc } from '../types/User.types'
-import { Button } from './generic utilities/Button'
+import { UserDoc } from '../../types/User.types'
+import { Button } from '../generic-utilities/Button'
 import { Link, useSearchParams } from 'react-router-dom'
-import { LoadingSpinner } from './generic utilities/LoadingSpinner'
-import { Alert } from './generic utilities/Alert'
-import { useErrorHandler } from '../hooks/useErrorHandler'
-import { useFirebaseUpdates } from '../hooks/firebase/useFirebaseUpdates'
+import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
+import { Alert } from '../generic-utilities/Alert'
+import { useErrorHandler } from '../../hooks/useErrorHandler'
+import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
 import shuffle from 'lodash/shuffle'
-import { WeekTable } from './table/WeekTable'
-import { useSuccessAlert } from '../hooks/useSucessAlert'
+import { WeekTable } from '../table/WeekTable'
+import { useSuccessAlert } from '../../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
-import { fetchFirebaseDocs, getCollectionLength, mealsCol, weeksCol } from '../services/firebase'
+import { fetchFirebaseDocs, getCollectionLength, mealsCol, weeksCol } from '../../services/firebase'
 import { where } from 'firebase/firestore'
-import { WeekPlan } from '../types/WeekPlan.types'
-import { useAuthContext } from '../hooks/useAuthContext'
+import { WeekPlan } from '../../types/WeekPlan.types'
+import { useAuthContext } from '../../hooks/useAuthContext'
 import { useQuery } from '@tanstack/react-query'
-import { Meal } from '../types/Meal.types'
+import { Meal } from '../../types/Meal.types'
 import { compact } from 'lodash'
 
 type MealPlanProps = {
@@ -103,8 +103,6 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const handleClickOnGenerateMealPlan = async () => {
 		resetError()
 		setSuccessState(false)
-
-
 
 		try {
 			setLoadingStatus(true)
@@ -200,13 +198,15 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 									Generate mealplan
 								</Button>
 							</div>
-							<p className="text-xs text-gray-500">or</p>
+							<p className="text-sm text-gray-500">or</p>
 							<div>
 								<Button>
-									Generate mealplan<br />
-									<span className='font-thin text-xs'>
-										with advanced alternatives
-									</span>
+									<Link to={`/generate/week/${displayedWeek}/year/${displayedYear}`}>
+										Generate<br />
+										<span className='font-thin text-xs'>
+											with advanced alternatives
+										</span>
+									</Link>
 								</Button>
 							</div>
 						</section>
@@ -219,9 +219,12 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				&& weeksDocs.length > 0
 				&& weeksDocs.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear)
 				&&
-				<WeekTable weekDoc={weeksDocs.find((week) => week.weekNumber === displayedWeek && week.year === displayedYear)} />
+				<WeekTable weekDoc={
+					weeksDocs.find((week) =>
+						week.weekNumber === displayedWeek
+						&& week.year === displayedYear)
+				} />
 			}
-
 
 		</>
 

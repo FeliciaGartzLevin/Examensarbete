@@ -3,7 +3,7 @@ import { useStreamUserDoc } from "../../../hooks/firebase/useStreamUserDoc"
 import { MealsPerDay } from "../questions/MealsPerDay"
 import { FoodPreferences } from "../questions/FoodPreferences"
 import { DbSource } from "../questions/DbSource"
-import { Divider } from "../../../components/generic utilities/Divider"
+import { Divider } from "../../../components/generic-utilities/Divider"
 
 export const UserPreferencesPage = () => {
 	const { activeUser } = useAuthContext()

@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { Button } from '../../../components/generic utilities/Button'
+import { Button } from '../../../components/generic-utilities/Button'
 import { EditAccountSchema, editAccountSchema } from '../../../schemas/AuthSchemas'
 import { useAuthContext } from '../../../hooks/useAuthContext'
 import { useEffect, useState } from 'react'
-import { Alert } from '../../../components/generic utilities/Alert'
+import { Alert } from '../../../components/generic-utilities/Alert'
 import { useErrorHandler } from '../../../hooks/useErrorHandler'
 import { Link } from 'react-router-dom'
 

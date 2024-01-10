@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom"
 import { UserImgAndName } from "../../../components/UserImgAndName"
-import { Divider } from "../../../components/generic utilities/Divider"
-import { ContentContainer } from "../../../components/generic utilities/ContentContainer"
+import { Divider } from "../../../components/generic-utilities/Divider"
+import { ContentContainer } from "../../../components/generic-utilities/ContentContainer"
 
 export const SettingsPage = () => {
 	return (
