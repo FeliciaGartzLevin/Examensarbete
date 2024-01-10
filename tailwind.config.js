@@ -29,7 +29,7 @@ export default {
 					'red': '#EF4444',
 					'lighter-red': lighten('red', 0.9),
 					'green': '#339900',
-					'lighter-green': lighten('green', 1.5),
+					'lighter-green': lighten('green', 2.5),
 					'orange': '#F08F0E',
 					'lighter-orange': lighten('orange', 0.9),
 				}
