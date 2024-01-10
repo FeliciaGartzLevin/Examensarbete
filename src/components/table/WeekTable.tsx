@@ -6,7 +6,7 @@ import { weekdays } from '../../helpers/dates'
 import { Alert } from '../generic utilities/Alert'
 import { LuUtensilsCrossed } from 'react-icons/lu'
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchFirebaseDocs, mealsCol } from '../../services/firebase'
 import { Meal } from '../../types/Meal.types'
 import { where } from 'firebase/firestore'
@@ -72,7 +72,11 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 		if (!mealsDocs) { throw new Error("Can't compare meal id's because mealsDocs couln't be found") }
 
 		const foundMeal = mealsDocs.find(mealDoc => mealDoc._id === weekDocMealId)
-		return foundMeal?.name || null
+		return (
+			<Link to={`/meal/${foundMeal?._id}`}>
+				{foundMeal?.name}
+			</Link>
+			|| null)
 	}
 
 	if (windowSizeisLoading || isLoadingMealsDocs) {

@@ -16,6 +16,7 @@ import { MealsOverView } from "./pages/auth-routes/MealsOverView"
 import { WeeksOverview } from "./pages/auth-routes/WeeksOverview"
 import { CreateMeal } from "./components/create-update-meal/CreateMeal"
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { MealDetails } from "./pages/auth-routes/MealDetails"
 
 export const App = () => {
 	return (
@@ -38,6 +39,12 @@ export const App = () => {
 					<Route path="/" element={
 						<AuthControl>
 							<LandingPage />
+						</AuthControl>
+					} />
+
+					<Route path="/meal/:mealId" element={
+						<AuthControl>
+							<MealDetails />
 						</AuthControl>
 					} />
 
