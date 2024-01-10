@@ -11,7 +11,7 @@ export const Logo: React.FC<LogoProps> = ({ text, link }) => {
 
 	const Content = () => {
 		return (
-			<div className='flex justify-between items-center gap-2'>
+			<h1 className='flex justify-between items-center gap-2'>
 				<div className='bg-white rounded-full p-2'>
 					<PiBowlFoodDuotone
 						size={40}
@@ -23,7 +23,7 @@ export const Logo: React.FC<LogoProps> = ({ text, link }) => {
 						Meal Plan Helper
 					</p>
 				}
-			</div>
+			</h1>
 
 		)
 	}
