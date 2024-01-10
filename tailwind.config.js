@@ -24,6 +24,8 @@ export default {
 				button: {
 					'green': '#19945D',
 					'green-hover': '#188C57',
+					'red': '#990B00',
+					'red-hover': '#660700',
 				},
 				alert: {
 					'red': '#EF4444',
