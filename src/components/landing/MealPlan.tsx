@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../../types/User.types'
 import { Button } from '../generic-utilities/Button'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -6,7 +6,6 @@ import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { Alert } from '../generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
 import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
-import shuffle from 'lodash/shuffle'
 import { WeekTable } from '../table/WeekTable'
 import { useSuccessAlert } from '../../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
@@ -16,7 +15,7 @@ import { WeekPlan } from '../../types/WeekPlan.types'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { Meal } from '../../types/Meal.types'
-import { compact } from 'lodash'
+import { generateMealsQueries, shuffleFn } from '../../helpers/generating-weekPlan'
 
 type MealPlanProps = {
 	userDoc: UserDoc
@@ -29,6 +28,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))
 	const { activeUser } = useAuthContext()
+	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
+	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 
 	if (!activeUser) { throw new Error("No active user") }
 
@@ -51,54 +52,42 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		),
 	})
 
-	const generateMealsQueries = () => {
-		// if generateFrom === "ownDishes", query only meals that active user are owner to, otherwise no query (will fetch all dishes)
-		const generateFromFilter = userDoc.preferences.generateFrom === "ownDishes"
-			? where("owner", "==", activeUser.uid)
-			: null
-
-		let prefFilter = null
-		if (userDoc.preferences.foodPreferences.length > 0) {
-			// if foodPreferences exists: query on them, otherwise no query, just get all meals
-			prefFilter = where("category", "array-contains-any", [userDoc.preferences.foodPreferences])
-		}
-
-		// compact = lodash function that removes all falsy values since QueryConstraint[] don't accept such
-		return compact([
-			prefFilter,
-			generateFromFilter
-		])
-	}
-
 	// fetching the mealDocs that matches the user prefs
 	const {
 		data: mealsDocsLenght,
+		isSuccess: isSuccessmealsDocsLenght,
 		isLoading: isLoadingMealsDocsLenght,
 		isError: isErrorMealsDocsLenght,
 		error: mealsDocsLenghtError,
 	} = useQuery({
 		queryKey: ["Length of meals collection"],
-		queryFn: () => getCollectionLength<Meal>(mealsCol),
+		queryFn: () => getCollectionLength<Meal>(
+			mealsCol,
+			generateMealsQueries(userDoc.preferences, activeUser.uid)
+		),
 		enabled: weekDocsIsSuccess
 			// don't fetch mealDocs lenght unnecessarily. it is not needed if weekDocs already exists
 			&& !(weeksDocs?.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear))
 	})
 	const { createNewWeek } = useFirebaseUpdates()
 	const mealsDocsLenghtData = mealsDocsLenght?.data().count
-	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
-	const mealAmountTooFew = mealsDocsLenghtData && mealsDocsLenghtData < requiredMealAmount
-	const mealAmountEnough = mealsDocsLenghtData && mealsDocsLenghtData >= requiredMealAmount
 
-	const shuffleFn = (mealsDocs: Meal[]) => {
-		if (!mealsDocs) { return }
+	console.log('error', Error,);
 
-		// shuffle all meals
-		const shuffledMeals = shuffle([...mealsDocs])
+	// const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
+	// const mealAmountTooFew = mealsDocsLenghtData && mealsDocsLenghtData < requiredMealAmount
+	// const mealAmountEnough = mealsDocsLenghtData && mealsDocsLenghtData >= requiredMealAmount
 
-		// get the first requiredMealAmount from the shuffled array
-		return shuffledMeals.slice(0, requiredMealAmount).map(meal => meal._id)
-	}
+	useEffect(() => {
+		if (!isSuccessmealsDocsLenght) { return }
 
+		if (mealsDocsLenghtData === 0) {
+			setMealAmoutEnough(false)
+		} else if (mealsDocsLenghtData && mealsDocsLenghtData >= 1) {
+			setMealAmoutEnough(mealsDocsLenghtData >= requiredMealAmount)
+		}
+
+	}, [mealsDocsLenghtData, isSuccessmealsDocsLenght, requiredMealAmount])
 
 	const handleClickOnGenerateMealPlan = async () => {
 		resetError()
@@ -109,12 +98,10 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 			const mealsArr = await fetchFirebaseDocs<Meal>(
 				mealsCol,
-				generateMealsQueries()
+				generateMealsQueries(userDoc.preferences, activeUser.uid)
 			)
-			console.log('mealsArr', mealsArr)
 
-
-			const shuffledMealIds = shuffleFn(mealsArr)
+			const shuffledMealIds = shuffleFn(mealsArr, requiredMealAmount)
 
 			if (!shuffledMealIds) { return }
 			// creating new mealplan in firebase db
@@ -155,32 +142,30 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			/>}
 
 			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
-			{!weeksDocs?.length &&
+			{!weeksDocs?.length && isSuccessmealsDocsLenght && !!mealsDocsLenght &&
 				<>
-					{mealAmountTooFew &&
+					{!mealAmountEnough &&
 						<section className="flex flex-col items-center gap-4 sm:px-14 md:px-20 lg:px-60">
 							<p>
 								There is not enough meals in the database for generating a weekly menu outgoing from your preferences.
 							</p>
 
-							{mealAmountTooFew && (
-								<p className='text-sm text-gray-500'>
-									You need to add {' '}
-									<span className='text-base'>{requiredMealAmount - mealsDocsLenghtData}</span>{' '}
-									more meals to the database
-									{userDoc.preferences.mealsPerDay === 2
-										? (
-											<span>
-												{' '}or change to 1 meal a day in the{' '}
-												<Link to="/settings/preferences" className="m-0 font-semibold">
-													settings
-												</Link>.
-											</span>
-										)
-										: '.'
-									}
-								</p>
-							)}
+							<p className='text-sm text-gray-500'>
+								You need to add {' '}
+								<span className='text-base'>{requiredMealAmount - mealsDocsLenghtData!}</span>{' '}
+								more meals to the database
+								{userDoc.preferences.mealsPerDay === 2
+									? (
+										<span>
+											{' '}or change to 1 meal a day in the{' '}
+											<Link to="/settings/preferences" className="m-0 font-semibold">
+												settings
+											</Link>.
+										</span>
+									)
+									: '.'
+								}
+							</p>
 
 							<Button>
 								<Link to="/create-meal">
@@ -215,7 +200,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			}
 
 			{/* If week has mealplan, show it  */}
-			{weekDocsIsSuccess
+			{
+				weekDocsIsSuccess
 				&& weeksDocs.length > 0
 				&& weeksDocs.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear)
 				&&
