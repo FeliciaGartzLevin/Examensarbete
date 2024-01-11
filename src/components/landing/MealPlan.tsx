@@ -67,7 +67,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		),
 		enabled: weekDocsIsSuccess
 			// don't fetch mealDocs lenght unnecessarily. it is not needed if weekDocs already exists
-			&& !(weeksDocs?.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear))
+			&& !(weeksDocs?.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear)),
+		staleTime: 0 // so it will refetch on every trigger at any time
 	})
 	const { createNewWeek } = useFirebaseUpdates()
 	const mealsDocsLenghtData = mealsDocsLenght?.data().count
