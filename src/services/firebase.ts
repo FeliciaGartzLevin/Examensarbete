@@ -56,7 +56,13 @@ export const fetchFirebaseDocs = async <T>(
 }
 
 //getting the lenght of a collection
-export const getCollectionLength = async <T>(colRef: CollectionReference<T>) => {
-	const snapshot = await getCountFromServer(colRef)
+export const getCollectionLength = async <T>(
+	colRef: CollectionReference<T>,
+	queryConstraints: QueryConstraint[]
+) => {
+
+	const queryRef = query(colRef, ...queryConstraints)
+
+	const snapshot = await getCountFromServer(queryRef)
 	return snapshot
 }
