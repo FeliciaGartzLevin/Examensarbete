@@ -26,6 +26,8 @@ export default {
 					'green-hover': '#188C57',
 					'red': '#990B00',
 					'red-hover': '#660700',
+					'neutral': '#968BAF',
+					'neutral-hover': '#7A74A4',
 				},
 				alert: {
 					'red': '#EF4444',

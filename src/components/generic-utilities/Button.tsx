@@ -7,18 +7,28 @@ type ButtonProps = {
 	type?: 'button' | 'submit'
 	disabled?: boolean
 	style?: 'fill' | 'ring'
-	color?: 'green' | 'red'
+	color?: 'green' | 'red' | 'neutral'
+	className?: string
 }
 
-export const Button: React.FC<ButtonProps> = ({ children, onClick, type = 'button', disabled = false, style = 'fill', color = 'green' }) => {
+export const Button: React.FC<ButtonProps> = ({
+	children,
+	onClick, type = 'button',
+	disabled = false,
+	style = 'fill',
+	color = 'green',
+	className
+}) => {
 
 	const buttonColorClasses = {
 		'text-white': style === 'fill',
-		'text-black': style === 'ring',
+		'text-black bg-transparent border-2': style === 'ring',
 		'bg-button-green hover:bg-button-green-hover': color === 'green',
 		'bg-button-red hover:bg-button-red-hover': color === 'red',
-		'border-button-green border-2 bg-transparent': color === 'green' && style === 'ring',
-		'border-button-red border-2 bg-transparent': color === 'red' && style === 'ring',
+		'bg-button-neutral hover:bg-button-neutral-hover': color === 'neutral',
+		'border-button-green': color === 'green' && style === 'ring',
+		'border-button-red': color === 'red' && style === 'ring',
+		'border-button-neutral': color === 'neutral' && style === 'ring',
 	};
 
 
@@ -29,7 +39,8 @@ export const Button: React.FC<ButtonProps> = ({ children, onClick, type = 'butto
 			onClick={onClick}
 			className={clsx(
 				'hover:border-transparent hover:text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline',
-				buttonColorClasses
+				buttonColorClasses,
+				className
 			)}>
 			{children}
 		</button >
