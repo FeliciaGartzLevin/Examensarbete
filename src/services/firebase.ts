@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import { getStorage } from "firebase/storage"
-import { CollectionReference, DocumentData, QueryConstraint, collection, getCountFromServer, getDocs, getFirestore, query } from "firebase/firestore"
+import { CollectionReference, DocumentData, QueryConstraint, collection, deleteDoc, doc, getCountFromServer, getDocs, getFirestore, query } from "firebase/firestore"
 import { Meal } from "../types/Meal.types"
 import { UserDoc } from "../types/User.types"
 import { WeekPlan } from "../types/WeekPlan.types"
@@ -37,6 +37,7 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const usersCol = createCollection<UserDoc>('users')
 export const mealsCol = createCollection<Meal>('meals')
 export const weeksCol = createCollection<WeekPlan>('weekplans')
+export const previewsCol = createCollection<WeekPlan>('previews')
 
 // A controlled generic fetch on the contrary to the useStreamCollection-hook
 export const fetchFirebaseDocs = async <T>(
@@ -62,7 +63,15 @@ export const getCollectionLength = async <T>(
 ) => {
 
 	const queryRef = query(colRef, ...queryConstraints)
+	return await getCountFromServer(queryRef)
 
-	const snapshot = await getCountFromServer(queryRef)
-	return snapshot
+}
+
+// Generic function to delete a document
+export const deleteFirebaseDoc = async <T>(
+	colRef: CollectionReference<T>,
+	docId: string
+) => {
+	const docRef = doc(colRef, docId);
+	return await deleteDoc(docRef);
 }

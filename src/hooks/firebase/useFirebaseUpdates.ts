@@ -1,16 +1,49 @@
-import { doc, setDoc } from "firebase/firestore"
-import { mealsCol, usersCol, weeksCol } from "../../services/firebase"
+import { doc, setDoc, where } from "firebase/firestore"
+import { fetchFirebaseDocs, mealsCol, previewsCol, usersCol, weeksCol } from "../../services/firebase"
 import { useAuthContext } from "../useAuthContext"
 import { UserPreferences } from "../../types/User.types"
 import { useErrorHandler } from "../useErrorHandler"
 import { CreateMealSchema } from "../../schemas/MealSchemas"
 import { v4 } from 'uuid'
-import { getMealPlanObject } from "../../helpers/restructure-object"
+import { getEmptyPreview, getMealPlanObject } from "../../helpers/restructure-object"
 import { findLastWeekOfTheYear } from "../../helpers/dates"
+import { WeekPlan } from "../../types/WeekPlan.types"
+import { compact } from "lodash"
 
 export const useFirebaseUpdates = () => {
 	const { activeUser } = useAuthContext()
 	const { errorMsg, resetError, handleError, loading, setLoadingStatus } = useErrorHandler()
+
+	const getWeekPlan = (displayedWeek: number, displayedYear: number) => {
+		if (!activeUser) { throw new Error("No active user") }
+
+		return fetchFirebaseDocs<WeekPlan>(
+			weeksCol,
+			[
+				where('owner', '==', activeUser.uid),
+				where('weekNumber', '==', displayedWeek),
+				where('year', '==', displayedYear),
+			]
+		)
+
+	}
+
+	const getPreview = (displayedWeek: number, displayedYear: number, previewId?: string) => {
+		if (!activeUser) { throw new Error("No active user") }
+
+		return fetchFirebaseDocs<WeekPlan>(
+			previewsCol,
+			compact([
+				where('owner', '==', activeUser.uid),
+				where('weekNumber', '==', displayedWeek),
+				where('year', '==', displayedYear),
+				previewId
+					? where("_id", "==", previewId)
+					: null
+			])
+		)
+
+	}
 
 	const createNewWeek = (mealIds: string[], mealsPerDay: UserPreferences['mealsPerDay'], weekNumber: number, year: number) => {
 		if (!activeUser) { throw new Error("No active user") }
@@ -36,13 +69,49 @@ export const useFirebaseUpdates = () => {
 		})
 	}
 
+	const createNewWeekPreview = async (mealsPerDay: UserPreferences['mealsPerDay'], weekNumber: number, year: number) => {
+		if (!activeUser) { throw new Error("No active user") }
+		const lastweekOfTheYear = findLastWeekOfTheYear(year)
+		if (weekNumber > lastweekOfTheYear) { throw new Error("That week doesn't exist") }
+
+		// create uuid
+		const _id = v4()
+
+		const mealsObject = getEmptyPreview(mealsPerDay)
+
+		// creating a new document reference with a uuid in 'previews' collection in firebase db
+		const docRef = doc(previewsCol, _id)
+
+		try {
+			setLoadingStatus(true)
+
+			// setting a new document with empty data
+			await setDoc(docRef, {
+				_id,
+				owner: activeUser.uid, // userId of the creator
+				weekNumber,
+				year,
+				mealsPerDay,
+				meals: mealsObject,
+			})
+
+			setLoadingStatus(false)
+			return _id
+
+		} catch (error) {
+			handleError(error)
+		}
+
+
+	}
+
 	const createNewMeal = (data: CreateMealSchema, starRating: number | null, imageUrl: string | null | undefined) => {
 		if (!activeUser) { throw new Error("No active user") }
 
 		// create uuid
 		const _id = v4()
 
-		// creating a new document reference with a uuid in 'meals' collection in firebase db
+		// creating a new document reference with a uuid in 'weeks' collection in firebase db
 		const docRef = doc(mealsCol, _id)
 
 		// setting the document with data from the user
@@ -91,6 +160,9 @@ export const useFirebaseUpdates = () => {
 		updateFirebaseDb,
 		createNewMeal,
 		createNewWeek,
+		createNewWeekPreview,
+		getPreview,
+		getWeekPlan,
 
 		// error and loading states
 		errorMsg,

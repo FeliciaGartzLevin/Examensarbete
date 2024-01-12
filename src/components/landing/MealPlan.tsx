@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../../types/User.types'
 import { Button } from '../generic-utilities/Button'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { Alert } from '../generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
@@ -9,9 +9,7 @@ import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
 import { WeekTable } from '../table/WeekTable'
 import { useSuccessAlert } from '../../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
-import { fetchFirebaseDocs, getCollectionLength, mealsCol, weeksCol } from '../../services/firebase'
-import { where } from 'firebase/firestore'
-import { WeekPlan } from '../../types/WeekPlan.types'
+import { deleteFirebaseDoc, fetchFirebaseDocs, getCollectionLength, mealsCol, previewsCol } from '../../services/firebase'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { Meal } from '../../types/Meal.types'
@@ -30,6 +28,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { activeUser } = useAuthContext()
 	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
+	const navigate = useNavigate()
+	const { getPreview, getWeekPlan, createNewWeekPreview } = useFirebaseUpdates()
 
 	if (!activeUser) { throw new Error("No active user") }
 
@@ -42,14 +42,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		refetch: refetchWeekDocs,
 	} = useQuery({
 		queryKey: ["weekPlan", { week: displayedWeek, year: displayedYear }],
-		queryFn: () => fetchFirebaseDocs<WeekPlan>(
-			weeksCol,
-			[
-				where('owner', '==', activeUser.uid),
-				where('weekNumber', '==', displayedWeek),
-				where('year', '==', displayedYear),
-			]
-		),
+		queryFn: () => getWeekPlan(displayedWeek, displayedYear),
 	})
 
 	// fetching the mealDocs that matches the user prefs
@@ -72,12 +65,6 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	})
 	const { createNewWeek } = useFirebaseUpdates()
 	const mealsDocsLenghtData = mealsDocsLenght?.data().count
-
-	console.log('error', Error,);
-
-	// const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
-	// const mealAmountTooFew = mealsDocsLenghtData && mealsDocsLenghtData < requiredMealAmount
-	// const mealAmountEnough = mealsDocsLenghtData && mealsDocsLenghtData >= requiredMealAmount
 
 	useEffect(() => {
 		if (!isSuccessmealsDocsLenght) { return }
@@ -117,6 +104,34 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			setSuccessState(false)
 		} finally {
 			setLoadingStatus(false)
+		}
+
+	}
+
+	const generatePreview = async () => {
+		try {
+			setLoadingStatus(true)
+
+			// checking if preview exist for displayedWeek and year
+			const preview = await getPreview(displayedWeek, displayedYear)
+
+			if (preview.length) {
+				// if preview exists, delete it/them in order to generate a new preview,
+				// that applies to current user preferences
+				await deleteFirebaseDoc(previewsCol, preview[0]._id)
+			}
+
+			console.log('ingen längd på preview');
+			// create a new preview and then navigate to it's page
+			const newPreviewId = await createNewWeekPreview(userDoc.preferences.mealsPerDay, displayedWeek, displayedYear)
+
+			if (!newPreviewId) { throw new Error("New week preview couldn't be created") }
+			navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${newPreviewId}`)
+
+			setLoadingStatus(false)
+
+		} catch (error) {
+			handleError(error)
 		}
 
 	}
@@ -186,13 +201,13 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 							</div>
 							<p className="text-sm text-gray-500">or</p>
 							<div>
-								<Button>
-									<Link to={`/generate/week/${displayedWeek}/year/${displayedYear}`}>
-										Generate<br />
-										<span className='font-thin text-xs'>
-											with advanced alternatives
-										</span>
-									</Link>
+								<Button onClick={generatePreview}>
+									{/* <Link to={`/generate/week/${displayedWeek}/year/${displayedYear}`}> */}
+									Generate<br />
+									<span className='font-thin text-xs'>
+										with advanced alternatives
+									</span>
+									{/* </Link> */}
 								</Button>
 							</div>
 						</section>

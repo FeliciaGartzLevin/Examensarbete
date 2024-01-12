@@ -1,39 +1,41 @@
-import React, { ReactNode, useState } from 'react'
-import { LunchAndDinner, OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
+import { useEffect, useState } from 'react'
+import { OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { weekdays } from '../../helpers/dates'
 import { Alert } from '../generic-utilities/Alert'
-import { LuUtensilsCrossed } from 'react-icons/lu'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
-import { fetchFirebaseDocs, usersCol } from '../../services/firebase'
+import { fetchFirebaseDocs, mealsCol, usersCol } from '../../services/firebase'
 import { where } from 'firebase/firestore'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { UserDoc } from '../../types/User.types'
 import { ImCross } from "react-icons/im";
-import { Modal } from '../generic-utilities/Modal'
 import { FaPencilAlt } from 'react-icons/fa'
-import Select from 'react-select'
 import { Meal } from '../../types/Meal.types'
-import { Button } from '../generic-utilities/Button'
+import { GenerateChoiceModal, Option } from '../GenerateChoiceModal'
+import { Link, useParams } from 'react-router-dom'
+import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
+import { getMealIds } from '../../helpers/restructure-object'
+import { generateMealsQueries } from '../../helpers/generating-weekPlan'
 
-type GenerateTableProps = {
-}
-
-type ClickedBtnType = {
+export type ClickedBtnType = {
 	weekday: keyof WeekPlan['meals'];
 	mealType: 'meal' | 'lunch' | 'dinner';
 }
 
 
-export const GenerateTable: React.FC<GenerateTableProps> = () => {
-	const { week: displayedWeek, year: displayedYear } = useParams()
+export const GenerateTable = () => {
+	const { week, year, previewId } = useParams()
+	const displayedWeek = Number(week)
+	const displayedYear = Number(year)
 	const { activeUser } = useAuthContext()
 	if (!activeUser) { throw new Error('No active user') }
 	const [showEditModal, setShowEditModal] = useState<boolean>(false)
-	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>(null)
+	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>({ weekday: 'monday', mealType: 'lunch' })
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
+	const [selectedValue, setSeletedValue] = useState<Option | null>(null)
+	const [mealsIdsArr, setMealsIdsArr] = useState<(string | null)[] | null>(null)
+	const { getPreview } = useFirebaseUpdates()
 	const weekArr = weekdays
 
 	const {
@@ -50,41 +52,50 @@ export const GenerateTable: React.FC<GenerateTableProps> = () => {
 		enabled: !!activeUser?.uid
 	})
 
+	const {
+		data: weekPreviews,
+		isLoading: isLoadingWeekPreviews,
+		isError: isErrorWeekPreviews,
+		error: weekPreviewsError,
+	} = useQuery({
+		queryKey: ["Week preview", { week: displayedWeek, year: displayedYear, previewId }],
+		queryFn: () => getPreview(displayedWeek, displayedYear, previewId),
+		enabled: !!previewId && !!displayedWeek && !!displayedYear
+	})
+
+	console.log('weekPreviews', weekPreviews);
+
 	const oneMeal = userDocs && userDocs[0].preferences?.mealsPerDay === 1
 	const twoMeals = userDocs && userDocs[0].preferences?.mealsPerDay === 2
+	const weekPreview = weekPreviews && weekPreviews[0]
+
 	console.log('clickedModal', clickedModal);
 
-	// const getMealIds = () => {
-	// 	const mealIdsArr: Array<string | null> = []
+	useEffect(() => {
+		if (!weekPreview || !oneMeal) { return }
+		setMealsIdsArr(
+			getMealIds(weekPreview, oneMeal)
+		)
 
-	// 	weekArr.map(weekday => {
-	// 		if (oneMeal) {
-	// 			mealIdsArr.push((weekDoc.meals as OneMealADay)[weekday as keyof WeekPlan['meals']])
-	// 		}
-	// 		if (twoMeals) {
-	// 			mealIdsArr.push((weekDoc.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch)
-	// 			mealIdsArr.push((weekDoc.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner)
-	// 		}
-	// 	})
-	// 	// Remove null values if any
-	// 	const filteredMealIds = mealIdsArr.filter((mealId) => mealId !== null);
+	}, [weekPreview, oneMeal])
 
-	// 	return filteredMealIds
-	// }
+	const {
+		data: mealDocs,
+		isLoading: isLoadingMealsDocs,
+		isError: isErrorMealsDocs,
+		error: mealsDocsError,
+	} = useQuery({
+		queryKey: ['All meals by user preferences'],
+		queryFn: () => fetchFirebaseDocs<Meal>(
+			mealsCol,
+			// [where("_id", "in", mealIdsArr)]
+			generateMealsQueries(userDocs![0].preferences, activeUser.uid)
+		),
+		enabled: !!userDocs,
+		staleTime: 3 * 60 * 1000 // 3 minutes - ev kortare, för skapas ett nytt meal så vill jag hämta direkt igen. hur?
+	})
 
-	// const {
-	// 	data: mealsDocs,
-	// 	isLoading: isLoadingMealsDocs,
-	// 	isError: isErrorMealsDocs,
-	// 	error: mealsDocsError,
-	// } = useQuery({
-	// 	queryKey: ["weekPlanMeals", { week: displayedWeek, year: displayedYear }],
-	// 	queryFn: () => fetchFirebaseDocs<Meal>(
-	// 		mealsCol,
-	// 		[where('_id', 'in', getMealIds())]
-	// 	),
-	// 	enabled: false
-	// })
+	console.log('mealDocs', mealDocs);
 
 	const getWeekdayName = (weekday: string) => {
 		const wkdnLong = weekday.charAt(0).toUpperCase() + weekday.slice(1)
@@ -99,21 +110,22 @@ export const GenerateTable: React.FC<GenerateTableProps> = () => {
 		return weekDayName
 	}
 
-	// const getMealName = (weekDocMealId: string | null) => {
-	// 	// function that returns the mealDoc.name whos mealDoc._id === weekDocMealId
-	// 	if (!mealsDocs) { throw new Error("Can't compare meal id's because meals couldn't be fetched") }
+	const getMealName = (weekDocMealId: string | null) => {
+		// function that returns the mealDoc.name whos mealDoc._id === weekDocMealId
+		if (!mealDocs) { throw new Error("Can't compare meal id's because meals couldn't be fetched") }
 
-	// 	const foundMeal = mealsDocs.find(mealDoc => mealDoc._id === weekDocMealId)
-	// 	return (
-	// 		<Link to={`/meal/${foundMeal?._id}`}>
-	// 			{foundMeal?.name}
-	// 		</Link>
-	// 		|| null)
-	// }
+		const foundMeal = mealDocs.find(mealDoc => mealDoc._id === weekDocMealId)
+		return (
+			<Link to={`/meal/${foundMeal?._id}`}>
+				{foundMeal?.name}
+			</Link>
+			|| null)
+	}
 
 	const handleEditClick = (object: ClickedBtnType) => {
 		setShowEditModal(true)
 		setClickedModal(object)
+		setSeletedValue(null)
 	}
 	const renderTableContent = (object: ClickedBtnType) => {
 
@@ -134,40 +146,24 @@ export const GenerateTable: React.FC<GenerateTableProps> = () => {
 			</button>
 		</div>)
 	}
+	console.log('selectedValue', selectedValue);
 
-	if (windowSizeisLoading || isLoadingUserDocs) {
+	if (windowSizeisLoading || isLoadingUserDocs || isLoadingMealsDocs || isLoadingWeekPreviews) {
 		return <LoadingSpinner />
 	}
 
 	return (
 		<>
 
-			{showEditModal &&
-				<div className='h-full w-full fixed top-0 left-0'>
-					<Modal hide={() => setShowEditModal(false)}>
-						<section>
-							<h2 className='h2'>
-								Filter
-							</h2>
-							{clickedModal &&
-								<p className='text-sm text-gray-500'>
-									{`for ${clickedModal?.weekday} ${clickedModal.mealType}`}
-								</p>
-							}
-						</section>
-						<section>
-							<h3 className='h3'>Choose specific mealt</h3>
-						</section>
-						<section>
-							<h3 className='h3'>Categories</h3>
-						</section>
-						<section>
-							<Button type="button" color="green" style="fill">
-								Save choice
-							</Button>
-						</section>
-					</Modal>
-				</div>
+			{/* MODAL for preferences */}
+			{showEditModal && clickedModal && mealDocs &&
+				<GenerateChoiceModal
+					selectedValue={val => setSeletedValue(val)}
+					hide={() => setShowEditModal(false)}
+					windowWidth={windowWidth}
+					mealDocs={mealDocs}
+					clickedModal={clickedModal}
+				/>
 			}
 
 			<div className='border border-black rounded-2xl'>
@@ -176,6 +172,16 @@ export const GenerateTable: React.FC<GenerateTableProps> = () => {
 					{isErrorUserDocs &&
 						<div className=' w-full h-full flex justify-center items-center'>
 							<Alert color='red' header={userDocsError.name || "Error"} body={userDocsError.message || "An error occured fetching meals"} />
+						</div>
+					}
+					{isErrorMealsDocs &&
+						<div className=' w-full h-full flex justify-center items-center'>
+							<Alert color='red' header={mealsDocsError.name || "Error"} body={mealsDocsError.message || "An error occured fetching meals"} />
+						</div>
+					}
+					{isErrorWeekPreviews &&
+						<div className=' w-full h-full flex justify-center items-center'>
+							<Alert color='red' header={weekPreviewsError.name || "Error"} body={weekPreviewsError.message || "An error occured fetching meals"} />
 						</div>
 					}
 

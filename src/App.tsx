@@ -43,7 +43,7 @@ export const App = () => {
 						</AuthControl>
 					} />
 
-					<Route path="/generate/week/:week/year/:year" element={
+					<Route path="/generate/week/:week/year/:year/previewId/:previewId" element={
 						<AuthControl>
 							<AdvancedMenuGenerator />
 						</AuthControl>
