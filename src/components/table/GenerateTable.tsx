@@ -45,7 +45,6 @@ export const GenerateTable = () => {
 	 *
 	 * stream user docs to always have them available if any changes are being made
 	 */
-	//
 	const {
 		data: userDocs,
 		isLoading: isLoadingUserDocs,
@@ -63,6 +62,7 @@ export const GenerateTable = () => {
 		isLoading: isLoadingWeekPreviews,
 		isError: isErrorWeekPreviews,
 		error: weekPreviewsError,
+		refetch: refetchWeekPreview,
 	} = useQuery({
 		queryKey: ["Week preview", { week: displayedWeek, year: displayedYear, previewId }],
 		queryFn: () => getPreview(displayedWeek, displayedYear, previewId),
@@ -237,11 +237,13 @@ export const GenerateTable = () => {
 			{/* MODAL for preferences */}
 			{showEditModal && clickedModal && mealDocs && weekPreview &&
 				<GenerateChoiceModal
-					selectedValue={val => setSeletedValue(val)}
+					// selectedValue={val => setSeletedValue(val)}
 					hide={() => setShowEditModal(false)}
 					windowWidth={windowWidth}
 					mealDocs={mealDocs}
 					clickedModal={clickedModal}
+					weekPreview={weekPreview}
+					refetchPreview={() => refetchWeekPreview()}
 				/>
 			}
 			{weekPreview &&

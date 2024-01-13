@@ -9,13 +9,18 @@ import Select, { GroupBase, OptionsOrGroups } from 'react-select'
 import { ClickedBtnType } from './table/GenerateTable';
 import { Meal, categories } from '../types/Meal.types';
 import { shuffle } from 'lodash';
+import { LunchAndDinner, OneMealADay, TwoMealsADay, WeekPlan } from '../types/WeekPlan.types';
+import { useFirebaseUpdates } from '../hooks/firebase/useFirebaseUpdates';
+import { useErrorHandler } from '../hooks/useErrorHandler';
+import { Alert } from './generic-utilities/Alert';
 
 type GenerateChoiceModalProps = {
 	hide: () => void
 	clickedModal: ClickedBtnType
 	mealDocs: Meal[]
 	windowWidth: number | null | undefined
-	selectedValue: (selected: Option | null) => void
+	weekPreview: WeekPlan
+	refetchPreview: () => void
 }
 
 export type Option = {
@@ -28,7 +33,8 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 	hide,
 	mealDocs,
 	windowWidth,
-	// selectedValue
+	weekPreview,
+	refetchPreview
 }) => {
 	const { week: displayedWeek, year: displayedYear } = useParams()
 	const [selectedMeal, setSelectedMeal] = useState<Option | null>(null)
@@ -37,6 +43,8 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 	const [selectedNotFound, setSelectedNotFound] = useState<boolean>(false)
 	const [showInfo, setShowInfo] = useState<boolean>(false)
 	const [surprise, setSurprise] = useState<boolean>(false)
+	const { updatePreview } = useFirebaseUpdates()
+	const { errorMsg, handleError, setLoadingStatus, loading } = useErrorHandler()
 
 	/* options for selects */
 	const getFreeSearchOptions = () => {
@@ -45,7 +53,6 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 				value: meal._id,
 				label: meal.name.charAt(0).toUpperCase() + meal.name.slice(1)
 			}
-
 		})
 		return nameArr as unknown as OptionsOrGroups<string, GroupBase<string>> | undefined
 	}
@@ -117,15 +124,64 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 
 	}
 
-	// const handleSaveChoice = () => {
-	// 	selectedValue(selected) // kan ev ta bort detta
+	const getUpdatedMeals = () => {
+		let updatedMeals: OneMealADay | TwoMealsADay = { ...weekPreview.meals }
 
-	// 	try {
-	// 		// uppdatera db med preview ( skapa preview )
-	// 	} catch (error) {
+		// for OneMealADay
+		if (clickedModal.mealType === 'meal') {
+			updatedMeals = {
+				...updatedMeals,
+				[clickedModal.weekday]: selected?.label || null,
+			} as OneMealADay
 
-	// 	}
-	// }
+			// for TwoMealsADay
+		} else {
+			const mealSlot = updatedMeals[clickedModal.weekday] as LunchAndDinner
+
+			updatedMeals = {
+				...updatedMeals,
+				[clickedModal.weekday]: {
+					lunch: clickedModal.mealType === 'lunch'
+						? selected?.value || null
+						: mealSlot.lunch || null,
+					dinner: clickedModal.mealType === 'dinner'
+						? selected?.value || null
+						: mealSlot?.dinner,
+				} as LunchAndDinner,
+			} as TwoMealsADay
+		}
+
+		return updatedMeals
+	}
+
+	const handleSaveChoice = async () => {
+
+		try {
+			setLoadingStatus(true)
+			// uppdate weekPreview
+			const updatedMeals = getUpdatedMeals()
+
+			const update = {
+				...weekPreview,
+				meals: updatedMeals
+			}
+
+			const updatedPreview = await updatePreview(update)
+
+			console.log('updatedPreview', updatedPreview);
+
+			refetchPreview()
+
+			// closing the modal
+			hide()
+
+
+		} catch (error) {
+			handleError(error)
+		} finally {
+			setLoadingStatus(false)
+		}
+	}
 
 	return (
 		<div className='h-full w-full fixed top-0 left-0'>
@@ -150,6 +206,9 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 							Choose between various options below to help you decide what you want to eat.
 						</p>
 					</section>
+
+					{errorMsg &&
+						<Alert color='red' header="Error" body={"An error occured when trying to save your meal." + errorMsg || ''} />}
 
 					<section className={'py-4 px-2 bg-white md:mx-[20%] rounded-md border-black border justify-center items-center flex flex-col  ' + `${selected || selectedNotFound ? 'block' : 'hidden'}`}>
 						{selectedNotFound &&
@@ -202,7 +261,12 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 						{selected &&
 							<>
 								<div>
-									<Button/*  onClick={handleSaveChoice} */ type="button" color="green" style="fill">
+									<Button
+										onClick={handleSaveChoice}
+										type="button" color="green"
+										style="fill"
+										disabled={loading}
+									>
 										Save choice
 									</Button>
 								</div>

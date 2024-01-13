@@ -1,4 +1,4 @@
-import { doc, setDoc, where } from "firebase/firestore"
+import { doc, setDoc, updateDoc, where } from "firebase/firestore"
 import { fetchFirebaseDocs, mealsCol, previewsCol, usersCol, weeksCol } from "../../services/firebase"
 import { useAuthContext } from "../useAuthContext"
 import { UserPreferences } from "../../types/User.types"
@@ -43,6 +43,12 @@ export const useFirebaseUpdates = () => {
 			])
 		)
 
+	}
+
+	const updatePreview = (preview: WeekPlan) => {
+		const docRef = doc(previewsCol, preview._id)
+
+		return updateDoc(docRef, preview)
 	}
 
 	const createNewWeek = (mealIds: string[], userPreferences: UserPreferences, weekNumber: number, year: number) => {
@@ -162,6 +168,7 @@ export const useFirebaseUpdates = () => {
 		createNewWeekPreview,
 		getPreview,
 		getWeekPlan,
+		updatePreview,
 
 		// error and loading states
 		errorMsg,

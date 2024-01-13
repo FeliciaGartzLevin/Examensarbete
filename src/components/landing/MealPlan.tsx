@@ -119,7 +119,10 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			if (preview.length) {
 
 				// if preview exists, check if the user preferences are same like the current user preferences settings
-				if (userDoc.preferences === preview[0].userPreferences) {
+				if (preview[0].userPreferences.mealsPerDay === userDoc.preferences.mealsPerDay
+					&& preview[0].userPreferences.generateFrom === userDoc.preferences.generateFrom
+					&& preview[0].userPreferences.foodPreferences.every((preference, index) => preference === userDoc.preferences.foodPreferences[index])
+				) {
 					// if so, navigate to mealPlan
 					return navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${preview[0]._id}`)
 
