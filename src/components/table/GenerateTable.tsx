@@ -10,13 +10,14 @@ import { useAuthContext } from '../../hooks/useAuthContext'
 import { ImCross } from "react-icons/im";
 import { FaPencilAlt } from 'react-icons/fa'
 import { Meal } from '../../types/Meal.types'
-import { GenerateChoiceModal, Option } from '../GenerateChoiceModal'
+import { GenerateChoiceModal } from '../GenerateChoiceModal'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
-// import { getMealIds } from '../../helpers/restructure-object'
 import { generateMealsQueries } from '../../helpers/generating-weekPlan'
 import { LuUtensilsCrossed } from 'react-icons/lu'
 import { useStreamUserDoc } from '../../hooks/firebase/useStreamUserDoc'
+import { FaQuestion } from "react-icons/fa";
+import { RiRestaurantLine } from 'react-icons/ri'
 
 export type ClickedBtnType = {
 	weekday: keyof WeekPlan['meals'];
@@ -32,14 +33,11 @@ export const GenerateTable = () => {
 	const [showEditModal, setShowEditModal] = useState<boolean>(false)
 	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>({ weekday: 'monday', mealType: 'lunch' })
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
-	const [selectedValue, setSeletedValue] = useState<Option | null>(null)
-	// const [mealsIdsArr, setMealsIdsArr] = useState<(string | null)[] | null>(null)
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 	const [redirect, setRedirect] = useState<boolean>(false)
 	const { getPreview, createNewWeekPreview } = useFirebaseUpdates()
 	const navigate = useNavigate()
 	const weekArr = weekdays
-
 	/**
 	 * Firebase streaming
 	 *
@@ -67,7 +65,7 @@ export const GenerateTable = () => {
 		queryKey: ["Week preview", { week: displayedWeek, year: displayedYear, previewId }],
 		queryFn: () => getPreview(displayedWeek, displayedYear, previewId),
 		enabled: !!previewId && !!displayedWeek && !!displayedYear,
-		staleTime: 0
+		staleTime: Infinity // ändra tbx sen!!!!!!!!! detta är bara för stylingen
 	})
 
 	const {
@@ -85,7 +83,7 @@ export const GenerateTable = () => {
 			generateMealsQueries(userDocs![0].preferences, activeUser.uid)
 		),
 		enabled: !!userDocs,
-		staleTime: 0,
+		staleTime: Infinity // ändra tbx sen!!!!!!!!! detta är bara för stylingen
 	})
 
 
@@ -97,14 +95,6 @@ export const GenerateTable = () => {
 	console.log('weekPreviews', weekPreviews);
 	console.log('clickedModal', clickedModal);
 	console.log('mealDocs', mealDocs);
-
-	// useEffect(() => {
-	// 	if (!weekPreview || !oneMeal) { return }
-	// 	setMealsIdsArr(
-	// 		getMealIds(weekPreview, oneMeal)
-	// 	)
-
-	// }, [weekPreview, oneMeal])
 
 	/**
 	 * Initial check to see if settings have changed, and if meals are still enough for creating recipes
@@ -138,7 +128,6 @@ export const GenerateTable = () => {
 	}
 
 	useEffect(() => {
-		console.log("going in the useEffect checking if pref arrays are the same");
 		if (!userDocs || !weekPreview || !mealAmountEnough) { return }
 		// checking if the arrays contains the same values
 		// if no preference settings have changed since preview was created: do nothing
@@ -146,7 +135,6 @@ export const GenerateTable = () => {
 			&& weekPreview.userPreferences.generateFrom === userDocs[0].preferences.generateFrom
 			&& weekPreview.userPreferences.foodPreferences.every((preference, index) => preference === userDocs[0].preferences.foodPreferences[index])
 		) { return }
-		console.log("they weren't the same, deleting old and creating new preview");
 
 		//  if preferences has changed: delete preview and create a new
 		deleteAndMakeNewPreview()
@@ -176,43 +164,57 @@ export const GenerateTable = () => {
 		// function that returns the mealDoc.name whos mealDoc._id === weekDocMealId
 		if (!mealDocs) { throw new Error("Can't find meal names because meals couldn't be fetched") }
 
+
+		if (weekDocMealId === 'eatOut' || weekDocMealId === 'noMeal' || !weekDocMealId) {
+			return (
+				<>
+					<div className='w-[1rem]'></div>
+					<div>
+						{weekDocMealId === 'eatOut' && <RiRestaurantLine size={33} />}
+						{weekDocMealId === 'noMeal' && <LuUtensilsCrossed size={33} />}
+						{!weekDocMealId && <FaQuestion size={33} />}
+					</div>
+				</>
+			)
+
+		}
+
 		const foundMeal = mealDocs.find(mealDoc => mealDoc._id === weekDocMealId)
 
-		return foundMeal?.name || null
+		return foundMeal?.name || <FaQuestion size={33} />
+
 	}
 
 	const handleEditClick = (object: ClickedBtnType) => {
 		setShowEditModal(true)
 		setClickedModal(object)
-		setSeletedValue(null)
 	}
 
 	const renderTableContent = (object: ClickedBtnType, weekDocMealId: string | null) => {
 		return (
+			<div className='flex justify-between items-center gap-2'>
+				{getMealName(weekDocMealId)}
 
-			<div className='flex justify-center items-center gap-2'>
-				<div className='mx-3'>
-					{getMealName(weekDocMealId) || <LuUtensilsCrossed size={30} />}
+				<div className='flex flex-col justify-between items-center gap-3'>
+					<button
+						onClick={() => handleEditClick(object)}
+						type='button'
+						title='Edit meal slot'
+						className='text-green-800 hover:bg-button-green-hover hover:text-white border border-black p-2'
+					>
+						<FaPencilAlt size={20} />
+					</button>
+					{/* onClick={updateRemoveFn där meal blir null ist} */}
+					<button
+						title='Remove meal from slot'
+						className='text-button-red text-lg hover:bg-button-red hover:text-white border border-black p-2'>
+						<ImCross />
+					</button>
+
 				</div>
-
-				<button
-					onClick={() => handleEditClick(object)}
-					type='button'
-					title='Edit meal slot'
-					className='text-gray-600 hover:text-black'
-				>
-					<FaPencilAlt size={23} />
-				</button>
-				{/* onClick={updateRemoveFn där meal blir null ist} */}
-				<button
-					title='Remove meal from slot'
-					className='text-button-red text-lg hover:text-button-red-hover'>
-					<ImCross />
-				</button>
 			</div>
 		)
 	}
-	console.log('selectedValue', selectedValue);
 
 	if (windowSizeisLoading || isLoadingUserDocs || isLoadingMealsDocs || isLoadingWeekPreviews) {
 		return <LoadingSpinner />
@@ -228,16 +230,14 @@ export const GenerateTable = () => {
 		return (
 			<Alert color='orange' header="Not enough meals" body="There are not enough meals to create a weekplan after changing your preferences. You are being redirected." />
 		)
-
 	}
 
 	return (
 		<>
 
-			{/* MODAL for preferences */}
+			{/* Modal for choosing */}
 			{showEditModal && clickedModal && mealDocs && weekPreview &&
 				<GenerateChoiceModal
-					// selectedValue={val => setSeletedValue(val)}
 					hide={() => setShowEditModal(false)}
 					windowWidth={windowWidth}
 					mealDocs={mealDocs}
@@ -246,25 +246,32 @@ export const GenerateTable = () => {
 					refetchPreview={() => refetchWeekPreview()}
 				/>
 			}
-			{weekPreview &&
-				<div className='border border-black rounded-2xl'>
+			{windowWidth && windowWidth < 640 && !windowSizeisLoading && weekPreview && weekPreview.userPreferences.mealsPerDay === 2 &&
+				<div className='h-full flex justify-center items-center mb-3'>
+					<Alert color='blackandwhite' body="Please turn your device screen for a better experience" className='w-[80%]' />
+				</div>
+			}
 
-					<table className="table-auto text-left">
-						{isErrorUserDocs &&
-							<div className=' w-full h-full flex justify-center items-center'>
-								<Alert color='red' header={"Error"} body={userDocsError || "An error occured fetching meals"} />
-							</div>
-						}
-						{isErrorMealsDocs &&
-							<div className=' w-full h-full flex justify-center items-center'>
-								<Alert color='red' header={mealsDocsError.name || "Error"} body={mealsDocsError.message || "An error occured fetching meals"} />
-							</div>
-						}
-						{isErrorWeekPreviews &&
-							<div className=' w-full h-full flex justify-center items-center'>
-								<Alert color='red' header={weekPreviewsError.name || "Error"} body={weekPreviewsError.message || "An error occured fetching meals"} />
-							</div>
-						}
+			{isErrorUserDocs &&
+				<div className='w-full h-full flex justify-center items-center mb-3'>
+					<Alert color='red' header={"Error"} body={userDocsError || "An error occured when fetching meals"} />
+				</div>
+			}
+			{isErrorMealsDocs &&
+				<div className=' w-full h-full flex justify-center items-center mb-3'>
+					<Alert color='red' header={mealsDocsError.name || "Error"} body={mealsDocsError.message || "An error occured fetching meals"} />
+				</div>
+			}
+			{isErrorWeekPreviews &&
+				<div className=' w-full h-full flex justify-center items-center mb-3'>
+					<Alert color='red' header={weekPreviewsError.name || "Error"} body={weekPreviewsError.message || "An error occured fetching meals"} />
+				</div>
+			}
+
+			{weekPreview &&
+				<div className='border border-black rounded-2xl overflow-hidden '>
+
+					<table className="table-auto text-left overflow-x-auto ">
 
 						<thead>
 							<tr className='bg-slate-200'>
@@ -287,9 +294,10 @@ export const GenerateTable = () => {
 									<tr key={index} className='odd:bg-white even:bg-slate-100'>
 
 										{/* Always render name of weekday */}
-										<td className='text-left flex items-center justify-between gap-2'>
-											{getWeekdayName(weekday)}
-
+										<td>
+											<div className='flex items-center justify-start'>
+												{getWeekdayName(weekday)}
+											</div>
 										</td>
 
 										{/* render if oneMealPerDay*/}

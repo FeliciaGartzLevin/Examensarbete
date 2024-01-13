@@ -49,6 +49,13 @@
 	}
 
 	/* Table */
+
+	table {
+		max-width: 95vw;
+		overflow-x: scroll;
+		display: block;
+	}
+
 	thead th {
 		@apply p-3
 	}
@@ -58,7 +65,7 @@
 	}
 
 	tr td:last-of-type {
-		@apply pl-3 pr-1 py-1
+		@apply pl-3 pr-2 py-1
 	}
 
 }

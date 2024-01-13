@@ -38,7 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
 			type={type}
 			onClick={onClick}
 			className={clsx(
-				'hover:border-transparent hover:text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline',
+				'hover:border-transparent hover:text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline shadow-lg',
 				buttonColorClasses,
 				className
 			)}>

@@ -85,7 +85,7 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 
 	return (
 		<>
-			<div className='border border-black rounded-2xl'>
+			<div className='border border-black rounded-2xl overflow-hidden'>
 
 				<table className="table-auto text-left relative">
 					{isErrorMealsDocs && mealsDocsError &&
