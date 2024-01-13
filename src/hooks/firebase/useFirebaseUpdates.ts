@@ -4,11 +4,11 @@ import { useAuthContext } from "../useAuthContext"
 import { UserPreferences } from "../../types/User.types"
 import { useErrorHandler } from "../useErrorHandler"
 import { CreateMealSchema } from "../../schemas/MealSchemas"
-import { v4 } from 'uuid'
 import { getEmptyPreview, getMealPlanObject } from "../../helpers/restructure-object"
 import { findLastWeekOfTheYear } from "../../helpers/dates"
 import { WeekPlan } from "../../types/WeekPlan.types"
 import { compact } from "lodash"
+import { v4 } from 'uuid'
 
 export const useFirebaseUpdates = () => {
 	const { activeUser } = useAuthContext()
@@ -45,7 +45,7 @@ export const useFirebaseUpdates = () => {
 
 	}
 
-	const createNewWeek = (mealIds: string[], mealsPerDay: UserPreferences['mealsPerDay'], weekNumber: number, year: number) => {
+	const createNewWeek = (mealIds: string[], userPreferences: UserPreferences, weekNumber: number, year: number) => {
 		if (!activeUser) { throw new Error("No active user") }
 		const lastweekOfTheYear = findLastWeekOfTheYear(year)
 		if (weekNumber > lastweekOfTheYear) { throw new Error("That week doesn't exist") }
@@ -53,7 +53,7 @@ export const useFirebaseUpdates = () => {
 		// create uuid
 		const _id = v4()
 
-		const mealsObject = getMealPlanObject(mealIds, mealsPerDay)
+		const mealsObject = getMealPlanObject(mealIds, userPreferences.mealsPerDay)
 
 		// creating a new document reference with a uuid in 'meals' collection in firebase db
 		const docRef = doc(weeksCol, _id)
@@ -64,12 +64,12 @@ export const useFirebaseUpdates = () => {
 			owner: activeUser.uid, // userId of the creator
 			weekNumber,
 			year,
-			mealsPerDay,
+			userPreferences,
 			meals: mealsObject,
 		})
 	}
 
-	const createNewWeekPreview = async (mealsPerDay: UserPreferences['mealsPerDay'], weekNumber: number, year: number) => {
+	const createNewWeekPreview = async (userPreferences: UserPreferences, weekNumber: number, year: number) => {
 		if (!activeUser) { throw new Error("No active user") }
 		const lastweekOfTheYear = findLastWeekOfTheYear(year)
 		if (weekNumber > lastweekOfTheYear) { throw new Error("That week doesn't exist") }
@@ -77,7 +77,7 @@ export const useFirebaseUpdates = () => {
 		// create uuid
 		const _id = v4()
 
-		const mealsObject = getEmptyPreview(mealsPerDay)
+		const mealsObject = getEmptyPreview(userPreferences.mealsPerDay)
 
 		// creating a new document reference with a uuid in 'previews' collection in firebase db
 		const docRef = doc(previewsCol, _id)
@@ -91,7 +91,7 @@ export const useFirebaseUpdates = () => {
 				owner: activeUser.uid, // userId of the creator
 				weekNumber,
 				year,
-				mealsPerDay,
+				userPreferences,
 				meals: mealsObject,
 			})
 
@@ -101,7 +101,6 @@ export const useFirebaseUpdates = () => {
 		} catch (error) {
 			handleError(error)
 		}
-
 
 	}
 

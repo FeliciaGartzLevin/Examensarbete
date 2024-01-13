@@ -18,8 +18,8 @@ type WeekTableProps = {
 export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const weekArr = weekdays
-	const oneMeal = weekDoc?.mealsPerDay === 1
-	const twoMeals = weekDoc?.mealsPerDay === 2
+	const oneMeal = weekDoc?.userPreferences.mealsPerDay === 1
+	const twoMeals = weekDoc?.userPreferences.mealsPerDay === 2
 	const [searchParams,] = useSearchParams()
 	const displayedWeek = Number(searchParams.get("week"))
 	const displayedYear = Number(searchParams.get("year"))

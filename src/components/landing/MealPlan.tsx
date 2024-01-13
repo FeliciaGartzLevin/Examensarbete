@@ -93,7 +93,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 			if (!shuffledMealIds) { return }
 			// creating new mealplan in firebase db
-			await createNewWeek(shuffledMealIds, userDoc.preferences.mealsPerDay, displayedWeek, displayedYear)
+			await createNewWeek(shuffledMealIds, userDoc.preferences, displayedWeek, displayedYear)
 
 			// show confirmation alert
 			setSuccessState(true)
@@ -115,15 +115,23 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 			// checking if preview exist for displayedWeek and year
 			const preview = await getPreview(displayedWeek, displayedYear)
 
+			// if preview exists
 			if (preview.length) {
-				// if preview exists, delete it/them in order to generate a new preview,
-				// that applies to current user preferences
-				await deleteFirebaseDoc(previewsCol, preview[0]._id)
+
+				// if preview exists, check if the user preferences are same like the current user preferences settings
+				if (userDoc.preferences === preview[0].userPreferences) {
+					// if so, navigate to mealPlan
+					return navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${preview[0]._id}`)
+
+				} else {
+					//  if else delete it in order to generate a new preview that applies to current user preferences
+					await deleteFirebaseDoc(previewsCol, preview[0]._id)
+				}
 			}
 
-			console.log('ingen längd på preview');
+			//if preview doesn't exist
 			// create a new preview and then navigate to it's page
-			const newPreviewId = await createNewWeekPreview(userDoc.preferences.mealsPerDay, displayedWeek, displayedYear)
+			const newPreviewId = await createNewWeekPreview(userDoc.preferences, displayedWeek, displayedYear)
 
 			if (!newPreviewId) { throw new Error("New week preview couldn't be created") }
 			navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${newPreviewId}`)

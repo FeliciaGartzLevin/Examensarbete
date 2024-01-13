@@ -5,7 +5,7 @@ import { GenerateTable } from '../../components/table/GenerateTable'
 import { useState } from 'react'
 
 export const AdvancedMenuGenerator = () => {
-	const [showInfo, setShowInfo] = useState<boolean>(true)
+	const [showInfo, setShowInfo] = useState<boolean>(false)
 	const { week: displayedWeek, year: displayedYear } = useParams()
 
 	return (

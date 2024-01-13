@@ -6,7 +6,7 @@ export type WeekPlan = {
 	weekNumber: number
 	year: number
 	meals: OneMealADay | TwoMealsADay
-	mealsPerDay: UserPreferences['mealsPerDay']
+	userPreferences: UserPreferences
 }
 
 export type OneMealADay = {
