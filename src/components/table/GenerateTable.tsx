@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
+import { useCallback, useEffect, useState } from 'react'
+import { LunchAndDinner, OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { weekdays } from '../../helpers/dates'
@@ -39,7 +39,7 @@ export const GenerateTable = () => {
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 	const [redirect, setRedirect] = useState<boolean>(false)
-	const { getPreview, createNewWeekPreview, addPreviewToWeek } = useFirebaseUpdates()
+	const { getPreview, createNewWeekPreview, addPreviewToWeek, updatePreview } = useFirebaseUpdates()
 	const navigate = useNavigate()
 	const weekArr = weekdays
 	const {
@@ -66,20 +66,6 @@ export const GenerateTable = () => {
 	 * Tanstack fetching
 	 *
 	 */
-
-	const {
-		data: weekPreviews,
-		isLoading: isLoadingWeekPreviews,
-		isError: isErrorWeekPreviews,
-		error: weekPreviewsError,
-		refetch: refetchWeekPreview,
-	} = useQuery({
-		queryKey: ["Week preview", { week: displayedWeek, year: displayedYear, previewId }],
-		queryFn: () => getPreview(displayedWeek, displayedYear, previewId),
-		enabled: !!previewId && !!displayedWeek && !!displayedYear,
-		staleTime: Infinity // ändra tbx sen!!!!!!!!! detta är bara för stylingen
-	})
-
 	const {
 		data: mealDocs,
 		isLoading: isLoadingMealsDocs,
@@ -95,9 +81,21 @@ export const GenerateTable = () => {
 			generateMealsQueries(userDocs![0].preferences, activeUser.uid)
 		),
 		enabled: !!userDocs,
-		staleTime: Infinity // ändra tbx sen!!!!!!!!! detta är bara för stylingen
+		staleTime: 1 * 1000
 	})
 
+	const {
+		data: weekPreviews,
+		isLoading: isLoadingWeekPreviews,
+		isError: isErrorWeekPreviews,
+		error: weekPreviewsError,
+		refetch: refetchWeekPreview,
+	} = useQuery({
+		queryKey: ["Week preview", { week: displayedWeek, year: displayedYear, previewId }],
+		queryFn: () => getPreview(displayedWeek, displayedYear, previewId),
+		enabled: !!previewId && !!displayedWeek && !!displayedYear && !!mealDocs,
+		staleTime: 1 * 1000
+	})
 
 	const oneMeal = userDocs && userDocs[0].preferences?.mealsPerDay === 1
 	const twoMeals = userDocs && userDocs[0].preferences?.mealsPerDay === 2
@@ -188,7 +186,6 @@ export const GenerateTable = () => {
 					</div>
 				</>
 			)
-
 		}
 
 		const foundMeal = mealDocs.find(mealDoc => mealDoc._id === weekDocMealId)
@@ -202,7 +199,37 @@ export const GenerateTable = () => {
 		setClickedModal(object)
 	}
 
-	const renderTableContent = (object: ClickedBtnType, weekDocMealId: string | null) => {
+	const handleDeleteClick = async (object: ClickedBtnType) => {
+		try {
+			setLoadingStatus(true)
+			if (!weekPreviews) { throw new Error('No week preview found') }
+
+			const updatedWeekPreview = { ...weekPreviews[0] }
+
+			if (updatedWeekPreview.userPreferences.mealsPerDay === 1) {
+				const meals = updatedWeekPreview.meals as OneMealADay;
+				meals[object.weekday] = null
+			} else {
+				const meals = updatedWeekPreview.meals as TwoMealsADay;
+				const mealDay = meals[object.weekday] as LunchAndDinner;
+
+				if (object.mealType === 'lunch') {
+					mealDay.lunch = null
+				} else if (object.mealType === 'dinner') {
+					mealDay.dinner = null
+				}
+			}
+
+			await updatePreview(updatedWeekPreview)
+			await refetchWeekPreview()
+			setLoadingStatus(false)
+		} catch (error) {
+			handleError(error)
+		}
+	}
+
+
+	const renderTableContent = useCallback((object: ClickedBtnType, weekDocMealId: string | null) => {
 		return (
 			<div className='flex justify-between items-center gap-2'>
 				{getMealName(weekDocMealId)}
@@ -216,17 +243,18 @@ export const GenerateTable = () => {
 					>
 						<FaPencilAlt size={20} />
 					</button>
-					{/* onClick={updateRemoveFn där meal blir null ist} */}
 					<button
+						onClick={() => handleDeleteClick(object)}
 						title='Remove meal from slot'
 						className='text-button-red text-lg hover:bg-button-red hover:text-white border border-black p-2'>
 						<ImCross />
 					</button>
-
 				</div>
 			</div>
 		)
-	}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [handleDeleteClick])
+
 
 	if (windowSizeisLoading || isLoadingUserDocs || isLoadingMealsDocs || isLoadingWeekPreviews) {
 		return <LoadingSpinner />
@@ -234,7 +262,6 @@ export const GenerateTable = () => {
 
 	// if not enough meals, redirect is set to true and user gets a warning message + being redirected
 	if (redirect) {
-
 		setTimeout(() => {
 			navigate(`/?week=${displayedWeek}&year=${displayedYear}`)
 		}, 5000)
@@ -248,7 +275,6 @@ export const GenerateTable = () => {
 		setShowEditModal(false)
 		setClickedModal(null)
 	}
-
 
 	const handleGenerateClick = async () => {
 		resetError()

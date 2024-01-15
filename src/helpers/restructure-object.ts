@@ -32,7 +32,7 @@ export const generateRandomForNullValues = (preview: WeekPlan, shuffledNotUsedMe
 	if (mealsPerDay === 1) {
 		const meals = updatedPreview.meals as OneMealADay
 
-		Object.keys(updatedPreview.meals).forEach(day => {
+		Object.keys(updatedPreview.meals).map(day => {
 			if (meals[day as keyof WeekPlan['meals']] === null) {
 				const randomMeal = shuffledNotUsedMeals.pop()
 				if (!randomMeal) { throw new Error('Not enough meals to create a new weekplan') }
@@ -47,7 +47,7 @@ export const generateRandomForNullValues = (preview: WeekPlan, shuffledNotUsedMe
 		Object.keys(updatedPreview.meals).map(day => {
 			const mealDay = meals[day as keyof WeekPlan['meals']] as LunchAndDinner
 
-			Object.keys(mealDay).forEach(mealType => {
+			Object.keys(mealDay).map(mealType => {
 				if (mealDay[mealType as keyof LunchAndDinner] === null) {
 					const randomMeal = shuffledNotUsedMeals.pop()
 					if (!randomMeal) { throw new Error('Not enough meals to create a new weekplan') }
