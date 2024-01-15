@@ -6,10 +6,12 @@ import { LoadingSpinner } from "../../components/generic-utilities/LoadingSpinne
 import { Alert } from "../../components/generic-utilities/Alert"
 import { Divider } from "../../components/generic-utilities/Divider"
 import { MealPlan } from "../../components/landing/MealPlan"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { findLastWeekOfTheYear, getCurrentWeekNumber } from "../../helpers/dates"
+import { PageInfo } from "../../components/generic-utilities/PageInfo"
 
 export const LandingPage = () => {
+	const [showInfo, setShowInfo] = useState<boolean>(false)
 	const { weekNumber, year } = getCurrentWeekNumber()
 	const [searchParams, setSearchParams] = useSearchParams()
 	const thisWeek = Number(searchParams.get("week"))
@@ -90,6 +92,22 @@ export const LandingPage = () => {
 	return (
 		<ContentContainer className="gap-6 px-12 md:px-20">
 			<h2 className="h2">Weekly meal plan</h2>
+
+			<PageInfo
+				onClick={() => setShowInfo(!showInfo)}
+				showInfo={showInfo}
+			>
+				<p className='text-left'>
+					Click on a meal in the menu to view
+					more info about, edit, comment on
+					or rate it. Click on the pen
+					on this page to edit the week.
+					If you are finished editing,s
+					click the check symbol in order to
+					save your changes.
+				</p>
+			</PageInfo>
+
 			<Pagination
 				header={'Week ' + searchParams.get("week") + ' of ' + searchParams.get("year")}
 				onClickBack={handleWeekPaginationBackwards}
