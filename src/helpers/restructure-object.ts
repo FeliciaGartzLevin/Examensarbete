@@ -1,5 +1,6 @@
+import { Meal } from "../types/Meal.types"
 import { UserPreferences } from "../types/User.types"
-import { OneMealADay, TwoMealsADay, WeekPlan } from "../types/WeekPlan.types"
+import { LunchAndDinner, OneMealADay, TwoMealsADay, WeekPlan } from "../types/WeekPlan.types"
 
 const daysOfWeek: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
@@ -19,6 +20,46 @@ export const getMealPlanObject = (ids: string[], mealsPerDay: UserPreferences['m
 	}, {} as OneMealADay | TwoMealsADay)
 
 	return mealsObject
+}
+
+export const generateRandomForNullValues = (preview: WeekPlan, shuffledNotUsedMeals: Meal[]) => {
+	const mealsPerDay = preview.userPreferences.mealsPerDay
+
+	// clone the weekPlan object
+	const updatedPreview = { ...preview }
+
+	// replace null values in the weekPreview object based on mealsPerDay
+	if (mealsPerDay === 1) {
+		const meals = updatedPreview.meals as OneMealADay
+
+		Object.keys(updatedPreview.meals).forEach(day => {
+			if (meals[day as keyof WeekPlan['meals']] === null) {
+				const randomMeal = shuffledNotUsedMeals.pop()
+				if (!randomMeal) { throw new Error('Not enough meals to create a new weekplan') }
+
+				// update the changed property on the weekPlan object
+				meals[day as keyof WeekPlan['meals']] = randomMeal._id
+			}
+		})
+	} else {
+		const meals = updatedPreview.meals as TwoMealsADay
+
+		Object.keys(updatedPreview.meals).map(day => {
+			const mealDay = meals[day as keyof WeekPlan['meals']] as LunchAndDinner
+
+			Object.keys(mealDay).forEach(mealType => {
+				if (mealDay[mealType as keyof LunchAndDinner] === null) {
+					const randomMeal = shuffledNotUsedMeals.pop()
+					if (!randomMeal) { throw new Error('Not enough meals to create a new weekplan') }
+
+					// update the changed property on the weekPlan object
+					mealDay[mealType as keyof LunchAndDinner] = randomMeal._id
+				}
+			})
+		})
+	}
+
+	return updatedPreview as WeekPlan
 }
 
 export const getEmptyPreview = (mealsPerDay: UserPreferences['mealsPerDay']) => {
@@ -53,7 +94,7 @@ export const getMealIds = (weekPreviewOrPlan: WeekPlan, oneMeal: boolean) => {
 	})
 
 	// Remove null values if any
-	const filteredMealIds = mealIdsArr.filter((mealId) => mealId !== null);
+	const filteredMealIds = mealIdsArr.filter((mealId) => mealId !== null)
 
 	return filteredMealIds
 }

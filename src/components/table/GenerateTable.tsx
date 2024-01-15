@@ -18,6 +18,10 @@ import { LuUtensilsCrossed } from 'react-icons/lu'
 import { useStreamUserDoc } from '../../hooks/firebase/useStreamUserDoc'
 import { FaQuestion } from "react-icons/fa";
 import { RiRestaurantLine } from 'react-icons/ri'
+import { Button } from '../generic-utilities/Button'
+import { useErrorHandler } from '../../hooks/useErrorHandler'
+import { generateRandomForNullValues, getMealIds } from '../../helpers/restructure-object'
+import { shuffle } from 'lodash'
 
 export type ClickedBtnType = {
 	weekday: keyof WeekPlan['meals'];
@@ -35,9 +39,17 @@ export const GenerateTable = () => {
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 	const [redirect, setRedirect] = useState<boolean>(false)
-	const { getPreview, createNewWeekPreview } = useFirebaseUpdates()
+	const { getPreview, createNewWeekPreview, addPreviewToWeek } = useFirebaseUpdates()
 	const navigate = useNavigate()
 	const weekArr = weekdays
+	const {
+		errorMsg,
+		handleError,
+		resetError,
+		loading,
+		setLoadingStatus
+	} = useErrorHandler()
+
 	/**
 	 * Firebase streaming
 	 *
@@ -237,6 +249,39 @@ export const GenerateTable = () => {
 		setClickedModal(null)
 	}
 
+
+	const handleGenerateClick = async () => {
+		resetError()
+		setLoadingStatus(true)
+		try {
+			const preview = await getPreview(Number(displayedWeek), Number(displayedYear), previewId)
+			if (!preview) { throw new Error('No preview to add could be found') }
+			if (!mealDocs) { throw new Error("Meals couldn't be found") }
+
+			// getting the meals that are not already used
+			const mealIdArray = getMealIds(preview[0], preview[0].userPreferences.mealsPerDay === 1)
+			const notUsedMeals = mealDocs?.filter(meal => !mealIdArray.includes(meal._id))
+
+			// shuffling them and replacing null values with meal-ids
+			const shuffledNotUsedMeals = shuffle([...notUsedMeals])
+			const previewWithReplacedNullValues = generateRandomForNullValues(preview[0], shuffledNotUsedMeals)
+
+			// adding the completed generated preview to weekplans collection
+			await addPreviewToWeek(previewWithReplacedNullValues)
+
+			// delete preview
+			await deleteFirebaseDoc(previewsCol, preview[0]._id)
+
+			// navigate to landing for displayedweek, to see the new weekplan
+			navigate(`/?week=${displayedWeek}&year=${displayedYear}`)
+
+		} catch (error) {
+			handleError(error)
+		} finally {
+			setLoadingStatus(false)
+		}
+	}
+
 	return (
 		<>
 
@@ -251,6 +296,7 @@ export const GenerateTable = () => {
 					refetchPreview={() => refetchWeekPreview()}
 				/>
 			}
+
 			{windowWidth && windowWidth < 640 && !windowSizeisLoading && weekPreview && weekPreview.userPreferences.mealsPerDay === 2 &&
 				<div className='h-full flex justify-center items-center mb-3'>
 					<Alert color='blackandwhite' body="Please turn your device screen for a better experience" className='w-[80%]' />
@@ -273,78 +319,104 @@ export const GenerateTable = () => {
 				</div>
 			}
 
-			{weekPreview &&
-				<div className='border border-black rounded-2xl overflow-hidden '>
-
-					<table className="table-auto text-left overflow-x-auto ">
-
-						<thead>
-							<tr className='bg-slate-200'>
-								<th>Day</th>
-								{oneMeal &&
-									<th>Meal</th>
-								}
-								{twoMeals &&
-									<>
-										<th>Lunch</th>
-										<th>Dinner</th>
-									</>
-								}
-							</tr>
-						</thead>
-
-						<tbody>
-							{weekArr.map((weekday, index) => {
-								return (
-									<tr key={index} className='odd:bg-white even:bg-slate-100'>
-
-										{/* Always render name of weekday */}
-										<td>
-											<div className='flex items-center justify-start'>
-												{getWeekdayName(weekday)}
-											</div>
-										</td>
-
-										{/* render if oneMealPerDay*/}
-										{oneMeal &&
-											<td>
-												{renderTableContent({
-													weekday: weekday as keyof WeekPlan['meals'],
-													mealType: 'meal'
-												},
-													(weekPreview.meals as OneMealADay)[weekday as keyof WeekPlan['meals']]
-												)}
-											</td>
-										}
-
-										{/* render if twoMealsPerDay*/}
-										{twoMeals &&
-											<td>
-												{renderTableContent({
-													weekday: weekday as keyof WeekPlan['meals'],
-													mealType: 'lunch'
-												},
-													(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch
-												)}
-											</td>
-										}
-										{twoMeals &&
-											<td>
-												{renderTableContent({
-													weekday: weekday as keyof WeekPlan['meals'],
-													mealType: 'dinner'
-												},
-													(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner
-												)}
-											</td>
-										}
-									</tr>
-								)
-							})}
-						</tbody>
-
-					</table>
+			{isErrorWeekPreviews &&
+				<div className=' w-full h-full flex justify-center items-center mb-3'>
+					<Alert color='red' header={weekPreviewsError.name || "Error"} body={weekPreviewsError.message || "An error occured fetching meals"} />
 				</div>
+			}
+
+			{errorMsg &&
+				<div className=' w-full h-full flex justify-center items-center mb-3'>
+					<Alert color='red' header={errorMsg || "Error"} body={errorMsg || "An error occured fetching meals"} />
+				</div>
+			}
+
+
+			{weekPreview &&
+				<>
+					<div className='border border-black rounded-2xl overflow-hidden '>
+
+						<table className="table-auto text-left overflow-x-auto no-scrollbar">
+
+							<thead>
+								<tr className='bg-slate-200'>
+									<th>Day</th>
+									{oneMeal &&
+										<th>Meal</th>
+									}
+									{twoMeals &&
+										<>
+											<th>Lunch</th>
+											<th>Dinner</th>
+										</>
+									}
+								</tr>
+							</thead>
+
+							<tbody>
+								{weekArr.map((weekday, index) => {
+									return (
+										<tr key={index} className='odd:bg-white even:bg-slate-100'>
+
+											{/* Always render name of weekday */}
+											<td>
+												<div className='flex items-center justify-start'>
+													{getWeekdayName(weekday)}
+												</div>
+											</td>
+
+											{/* render if oneMealPerDay*/}
+											{oneMeal &&
+												<td>
+													{renderTableContent({
+														weekday: weekday as keyof WeekPlan['meals'],
+														mealType: 'meal'
+													},
+														(weekPreview.meals as OneMealADay)[weekday as keyof WeekPlan['meals']]
+													)}
+												</td>
+											}
+
+											{/* render if twoMealsPerDay*/}
+											{twoMeals &&
+												<td>
+													{renderTableContent({
+														weekday: weekday as keyof WeekPlan['meals'],
+														mealType: 'lunch'
+													},
+														(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch
+													)}
+												</td>
+											}
+											{twoMeals &&
+												<td>
+													{renderTableContent({
+														weekday: weekday as keyof WeekPlan['meals'],
+														mealType: 'dinner'
+													},
+														(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner
+													)}
+												</td>
+											}
+										</tr>
+									)
+								})}
+							</tbody>
+						</table>
+					</div>
+
+					{previewId &&
+						<div className='mt-6 mb-4'>
+							<Button
+								onClick={handleGenerateClick}
+								disabled={loading}
+							>
+								Generate mealplan
+							</Button>
+
+						</div>
+					}
+				</>
 			}
 		</>
 	)

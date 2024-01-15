@@ -25,7 +25,6 @@ export const useFirebaseUpdates = () => {
 				where('year', '==', displayedYear),
 			]
 		)
-
 	}
 
 	const getPreview = (displayedWeek: number, displayedYear: number, previewId?: string) => {
@@ -42,13 +41,20 @@ export const useFirebaseUpdates = () => {
 					: null
 			])
 		)
-
 	}
 
 	const updatePreview = (preview: WeekPlan) => {
 		const docRef = doc(previewsCol, preview._id)
 
 		return updateDoc(docRef, preview)
+	}
+
+	const addPreviewToWeek = (generatedPreview: WeekPlan) => {
+		// creating a new document reference with a uuid in 'weeks' collection in firebase db
+		const docRef = doc(weeksCol, generatedPreview._id)
+
+		// setting the document with data from the generated preview
+		return setDoc(docRef, generatedPreview)
 	}
 
 	const createNewWeek = (mealIds: string[], userPreferences: UserPreferences, weekNumber: number, year: number) => {
@@ -161,14 +167,15 @@ export const useFirebaseUpdates = () => {
 
 	return {
 		// functions
-		updateUserPreferences,
-		updateFirebaseDb,
+		addPreviewToWeek,
 		createNewMeal,
 		createNewWeek,
 		createNewWeekPreview,
 		getPreview,
 		getWeekPlan,
+		updateFirebaseDb,
 		updatePreview,
+		updateUserPreferences,
 
 		// error and loading states
 		errorMsg,

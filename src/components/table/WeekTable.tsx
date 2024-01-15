@@ -87,7 +87,7 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc }) => {
 		<>
 			<div className='border border-black rounded-2xl overflow-hidden'>
 
-				<table className="table-auto text-left relative">
+				<table className="table-auto text-left relative no-scrollbar">
 					{isErrorMealsDocs && mealsDocsError &&
 						<div className='absolute w-full h-full flex justify-center items-center'>
 							<Alert color='red' header={mealsDocsError.name || "Error"} body={mealsDocsError.message || "An error occured fetching meals"} />
