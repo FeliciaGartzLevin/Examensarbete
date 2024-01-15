@@ -112,75 +112,78 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 	}
 
 	return (
-		<div className='border border-black rounded-2xl overflow-hidden'>
+		<div className='border border-black rounded-2xl'>
 
-			<table className="table-fixed text-left overflow-x-auto no-scrollbar">
+			<div className='overflow-x-scroll no-scrollbar'>
 
-				<thead>
-					<tr className='bg-slate-200'>
-						<th>Day</th>
-						{oneMeal &&
-							<th >Meal</th>
-						}
-						{!oneMeal &&
-							<>
-								<th>Lunch</th>
-								<th>Dinner</th>
-							</>
-						}
-					</tr>
-				</thead>
+				<table className="table-auto text-left overflow-x-scroll no-scrollbar">
 
-				<tbody>
-					{weekArr.map((weekday, index) => {
-						return (
-							<tr key={index} className='odd:bg-white even:bg-slate-100'>
+					<thead>
+						<tr className='bg-slate-200'>
+							<th>Day</th>
+							{oneMeal &&
+								<th >Meal</th>
+							}
+							{!oneMeal &&
+								<>
+									<th>Lunch</th>
+									<th>Dinner</th>
+								</>
+							}
+						</tr>
+					</thead>
 
-								{/* Always render name of weekday */}
-								<td>
-									<div className='flex items-center justify-start'>
-										{getWeekdayName(weekday)}
-									</div>
-								</td>
+					<tbody>
+						{weekArr.map((weekday, index) => {
+							return (
+								<tr key={index} className='odd:bg-white even:bg-slate-100'>
 
-								{/* render if oneMealPerDay*/}
-								{oneMeal &&
-									<td >
-										{renderTableContent({
-											weekday: weekday as keyof WeekPlan['meals'],
-											mealType: 'meal'
-										},
-											(weekPreview.meals as OneMealADay)[weekday as keyof WeekPlan['meals']]
-										)}
+									{/* Always render name of weekday */}
+									<td>
+										<div className='flex items-center justify-start'>
+											{getWeekdayName(weekday)}
+										</div>
 									</td>
-								}
 
-								{/* render if twoMealsPerDay*/}
-								{!oneMeal &&
-									<td >
-										{renderTableContent({
-											weekday: weekday as keyof WeekPlan['meals'],
-											mealType: 'lunch'
-										},
-											(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch
-										)}
-									</td>
-								}
-								{!oneMeal &&
-									<td >
-										{renderTableContent({
-											weekday: weekday as keyof WeekPlan['meals'],
-											mealType: 'dinner'
-										},
-											(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner
-										)}
-									</td>
-								}
-							</tr>
-						)
-					})}
-				</tbody>
-			</table>
+									{/* render if oneMealPerDay*/}
+									{oneMeal &&
+										<td >
+											{renderTableContent({
+												weekday: weekday as keyof WeekPlan['meals'],
+												mealType: 'meal'
+											},
+												(weekPreview.meals as OneMealADay)[weekday as keyof WeekPlan['meals']]
+											)}
+										</td>
+									}
+
+									{/* render if twoMealsPerDay*/}
+									{!oneMeal &&
+										<td >
+											{renderTableContent({
+												weekday: weekday as keyof WeekPlan['meals'],
+												mealType: 'lunch'
+											},
+												(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].lunch
+											)}
+										</td>
+									}
+									{!oneMeal &&
+										<td >
+											{renderTableContent({
+												weekday: weekday as keyof WeekPlan['meals'],
+												mealType: 'dinner'
+											},
+												(weekPreview.meals as TwoMealsADay)[weekday as keyof WeekPlan['meals']].dinner
+											)}
+										</td>
+									}
+								</tr>
+							)
+						})}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	)
 }
