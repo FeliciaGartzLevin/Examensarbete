@@ -51,9 +51,7 @@
 	/* Table */
 
 	table {
-		max-width: 95vw;
-		overflow-x: scroll;
-		display: block;
+		@apply w-full
 	}
 
 	thead th {
@@ -115,4 +113,15 @@ tr:last-of-type td:first-of-type {
 
 tr:last-of-type td:last-of-type {
 	border-bottom-right-radius: 1rem;
+}
+
+td:first-of-type {
+	width: auto;
+}
+
+th td:nth-of-type(2),
+th td:nth-of-type(3),
+tr td:nth-of-type(2),
+tr td:nth-of-type(3) {
+	width: 50%;
 }

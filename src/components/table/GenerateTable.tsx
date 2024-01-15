@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LunchAndDinner, OneMealADay, TwoMealsADay, WeekPlan } from '../../types/WeekPlan.types'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
@@ -154,7 +154,7 @@ export const GenerateTable = () => {
 		setClickedModal(object)
 	}
 
-	const handleDeleteClick = useCallback(async (object: ClickedBtnType) => {
+	const handleDeleteClick = async (object: ClickedBtnType) => {
 		try {
 			setLoadingStatus(true)
 			if (!weekPreviews) { throw new Error('No week preview found') }
@@ -181,8 +181,7 @@ export const GenerateTable = () => {
 		} catch (error) {
 			handleError(error)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}
 
 	if (windowSizeisLoading || isLoadingUserDocs || isLoadingMealsDocs || isLoadingWeekPreviews) {
 		return <LoadingSpinner />
