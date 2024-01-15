@@ -31,7 +31,7 @@ export const GenerateTable = () => {
 	const { activeUser } = useAuthContext()
 	if (!activeUser) { throw new Error('No active user') }
 	const [showEditModal, setShowEditModal] = useState<boolean>(false)
-	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>({ weekday: 'monday', mealType: 'lunch' })
+	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>(null)
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 	const [redirect, setRedirect] = useState<boolean>(false)
@@ -232,13 +232,18 @@ export const GenerateTable = () => {
 		)
 	}
 
+	const hideFn = () => {
+		setShowEditModal(false)
+		setClickedModal(null)
+	}
+
 	return (
 		<>
 
 			{/* Modal for choosing */}
 			{showEditModal && clickedModal && mealDocs && weekPreview &&
 				<GenerateChoiceModal
-					hide={() => setShowEditModal(false)}
+					hide={hideFn}
 					windowWidth={windowWidth}
 					mealDocs={mealDocs}
 					clickedModal={clickedModal}
