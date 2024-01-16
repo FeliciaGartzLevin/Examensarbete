@@ -9,6 +9,7 @@ type ButtonProps = {
 	style?: 'fill' | 'ring'
 	color?: 'green' | 'red' | 'neutral'
 	className?: string
+	title?: string
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -17,7 +18,8 @@ export const Button: React.FC<ButtonProps> = ({
 	disabled = false,
 	style = 'fill',
 	color = 'green',
-	className
+	className,
+	title
 }) => {
 
 	const buttonColorClasses = {
@@ -34,6 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 	return (
 		<button
+			title={title}
 			disabled={disabled}
 			type={type}
 			onClick={onClick}
