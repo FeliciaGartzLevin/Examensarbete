@@ -83,6 +83,7 @@ export const CreateMeal = () => {
 		})
 
 		try {
+			resetError()
 			setLoadingStatus(true)
 
 			// uploading image, if any, to firebase storage + getting url for new image

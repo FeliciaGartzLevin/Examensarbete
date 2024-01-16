@@ -94,10 +94,6 @@ export const GenerateTable = () => {
 	const requiredMealAmount = userDocs && userDocs[0].preferences.mealsPerDay === 1 ? 7 : 14
 	const weekPreview = weekPreviews && weekPreviews[0]
 
-	console.log('weekPreviews', weekPreviews);
-	console.log('clickedModal', clickedModal);
-	console.log('mealDocs', mealDocs);
-
 	/**
 	 * Initial check to see if settings have changed, and if meals are still enough for creating recipes
 	 *

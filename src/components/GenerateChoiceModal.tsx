@@ -44,7 +44,7 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 	const [showInfo, setShowInfo] = useState<boolean>(false)
 	const [surprise, setSurprise] = useState<boolean>(false)
 	const { updatePreview } = useFirebaseUpdates()
-	const { errorMsg, handleError, setLoadingStatus, loading } = useErrorHandler()
+	const { errorMsg, handleError, setLoadingStatus, resetError, loading } = useErrorHandler()
 
 	/* options for selects */
 	const getFreeSearchOptions = () => {
@@ -157,6 +157,7 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 	const handleSaveChoice = async () => {
 
 		try {
+			resetError()
 			setLoadingStatus(true)
 			// uppdate weekPreview
 			const updatedMeals = getUpdatedMeals()
@@ -166,15 +167,12 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 				meals: updatedMeals
 			}
 
-			const updatedPreview = await updatePreview(update)
-
-			console.log('updatedPreview', updatedPreview);
+			await updatePreview(update)
 
 			refetchPreview()
 
 			// closing the modal
 			hide()
-
 
 		} catch (error) {
 			handleError(error)
