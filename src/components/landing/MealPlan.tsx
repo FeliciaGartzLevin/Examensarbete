@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../../types/User.types'
 import { Button } from '../generic-utilities/Button'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { Alert } from '../generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
@@ -9,11 +9,13 @@ import { useFirebaseUpdates } from '../../hooks/firebase/useFirebaseUpdates'
 import { WeekTable } from '../table/WeekTable'
 import { useSuccessAlert } from '../../hooks/useSucessAlert'
 import { FaCheck } from 'react-icons/fa6'
-import { deleteFirebaseDoc, fetchFirebaseDocs, getCollectionLength, mealsCol, previewsCol } from '../../services/firebase'
+import { fetchFirebaseDocs, getCollectionLength, mealsCol } from '../../services/firebase'
 import { useAuthContext } from '../../hooks/useAuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { Meal } from '../../types/Meal.types'
 import { generateMealsQueries, shuffleFn } from '../../helpers/generating-weekPlan'
+import { useGeneratePreview } from '../../hooks/firebase/useGeneratePreview'
+
 
 type MealPlanProps = {
 	userDoc: UserDoc
@@ -28,8 +30,8 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const { activeUser } = useAuthContext()
 	const requiredMealAmount = userDoc.preferences.mealsPerDay === 1 ? 7 : 14
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
-	const navigate = useNavigate()
-	const { getPreview, getWeekPlan, createNewWeekPreview } = useFirebaseUpdates()
+	const { getWeekPlan } = useFirebaseUpdates()
+	const { generatePreview } = useGeneratePreview('generate')
 
 	if (!activeUser) { throw new Error("No active user") }
 
@@ -108,45 +110,6 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 
 	}
 
-	const generatePreview = async () => {
-		try {
-			setLoadingStatus(true)
-
-			// checking if preview exist for displayedWeek and year
-			const preview = await getPreview(displayedWeek, displayedYear)
-
-			// if preview exists
-			if (preview.length) {
-
-				// if preview exists, check if the user preferences are same like the current user preferences settings
-				if (preview[0].userPreferences.mealsPerDay === userDoc.preferences.mealsPerDay
-					&& preview[0].userPreferences.generateFrom === userDoc.preferences.generateFrom
-					&& preview[0].userPreferences.foodPreferences.every((preference, index) => preference === userDoc.preferences.foodPreferences[index])
-				) {
-					// if so, navigate to mealPlan
-					return navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${preview[0]._id}`)
-
-				} else {
-					//  if else delete it in order to generate a new preview that applies to current user preferences
-					await deleteFirebaseDoc(previewsCol, preview[0]._id)
-				}
-			}
-
-			//if preview doesn't exist
-			// create a new preview and then navigate to it's page
-			const newPreviewId = await createNewWeekPreview(userDoc.preferences, displayedWeek, displayedYear)
-
-			if (!newPreviewId) { throw new Error("New week preview couldn't be created") }
-			navigate(`/generate/week/${displayedWeek}/year/${displayedYear}/previewId/${newPreviewId}`)
-
-			setLoadingStatus(false)
-
-		} catch (error) {
-			handleError(error)
-		}
-
-	}
-
 	if (isLoadingMealsDocsLenght || isLoadingWeeksDocs || loading) {
 		return <LoadingSpinner />
 	}
@@ -212,13 +175,11 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 							</div>
 							<p className="text-sm text-gray-500">or</p>
 							<div>
-								<Button onClick={generatePreview}>
-									{/* <Link to={`/generate/week/${displayedWeek}/year/${displayedYear}`}> */}
+								<Button onClick={() => generatePreview(userDoc, displayedWeek, displayedYear)}>
 									Generate<br />
 									<span className='font-thin text-xs'>
 										with advanced alternatives
 									</span>
-									{/* </Link> */}
 								</Button>
 							</div>
 						</section>
@@ -232,11 +193,14 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				&& weeksDocs.length > 0
 				&& weeksDocs.some((week) => week.weekNumber === displayedWeek && week.year === displayedYear)
 				&&
-				<WeekTable weekDoc={
-					weeksDocs.find((week) =>
-						week.weekNumber === displayedWeek
-						&& week.year === displayedYear)
-				} />
+				<WeekTable
+					userDoc={userDoc}
+					weekDoc={
+						weeksDocs.find((week) =>
+							week.weekNumber === displayedWeek
+							&& week.year === displayedYear)
+					} />
+
 			}
 
 		</>
