@@ -50,8 +50,9 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc, userDoc }) => {
 		isLoading: isLoadingMealsDocs,
 		isError: isErrorMealsDocs,
 		error: mealsDocsError,
+		refetch: refetchMealsDocs,
 	} = useQuery({
-		queryKey: ["weekPlanMeals", { week: displayedWeek, year: displayedYear }],
+		queryKey: ["weekPlanMeals", { week: displayedWeek, year: displayedYear, ids: getMealIds() }],
 		queryFn: () => fetchFirebaseDocs<Meal>(
 			mealsCol,
 			[where('_id', 'in', getMealIds())]

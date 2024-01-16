@@ -64,7 +64,7 @@ export const MealDetails = () => {
 						</div>}
 					{meal.link &&
 						<Button type="button" style="ring" color="green">
-							<Link to={meal.link} className="flex items-center justify-center gap-2">
+							<Link target="_blank" to={meal.link} className="flex items-center justify-center gap-2">
 								<BsGlobe />
 								<span>
 									Link to recipe

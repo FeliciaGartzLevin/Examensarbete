@@ -131,7 +131,7 @@ export const GenerateChoiceModal: React.FC<GenerateChoiceModalProps> = ({
 		if (clickedModal.mealType === 'meal') {
 			updatedMeals = {
 				...updatedMeals,
-				[clickedModal.weekday]: selected?.label || null,
+				[clickedModal.weekday]: selected?.value || null,
 			} as OneMealADay
 
 			// for TwoMealsADay

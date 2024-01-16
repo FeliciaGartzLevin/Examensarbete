@@ -10,17 +10,17 @@ type NavLinksProps = {
 export const NavLinks: React.FC<NavLinksProps> = ({ className, onClick, signOutButton }) => {
 	return (
 		<ul onClick={onClick} className={"flex items-center justify-center gap-6 md:gap-10 " + (className ?? '')}>
-			<li>
+			{/* <li className="">
 				<NavLink to="/">
 					Home
 				</NavLink>
-			</li>
+			</li> */}
 			<li>
 				<NavLink to="/create-meal" className="inline-flex items-center gap-2">
 					<BsJournalPlus /> Create new meal
 				</NavLink>
 			</li>
-			<li>
+			{/* <li>
 				<NavLink to="/meals">
 					Meals overview
 				</NavLink>
@@ -29,7 +29,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({ className, onClick, signOutB
 				<NavLink to="/weeks">
 					Weeks overview
 				</NavLink>
-			</li>
+			</li> */}
 			<li>
 				{signOutButton}
 			</li>
