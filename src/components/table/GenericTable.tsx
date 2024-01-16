@@ -10,6 +10,7 @@ import { RiRestaurantLine } from 'react-icons/ri'
 import { LuUtensilsCrossed } from 'react-icons/lu'
 import { Meal } from '../../types/Meal.types'
 import { weekdays } from '../../helpers/dates'
+import { Link } from 'react-router-dom'
 
 
 type GenericTableProps = {
@@ -65,8 +66,19 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 
 		const foundMeal = mealDocs.find(mealDoc => mealDoc._id === weekDocMealId)
 
-		return foundMeal?.name || <FaQuestion size={33} />
+		if (editTable && foundMeal?.name) {
+			return foundMeal.name
 
+		} else if (!editTable && foundMeal?.name) {
+			return (
+				<Link to={`/meal/${foundMeal?._id}`}>
+					{foundMeal?.name}
+				</Link>
+			)
+
+		} else {
+			return <FaQuestion size={33} />
+		}
 	}
 
 	const renderTableContent = useCallback((object: ClickedBtnType, weekDocMealId: string | null) => {
@@ -74,7 +86,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 		const renderEditButtons = () => {
 			if (handleDeleteClick && handleEditClick) {
 				return (
-					<div className='flex justify-end gap-3'>
+					<div className='flex gap-3'>
 						<button
 							onClick={() => handleEditClick(object)}
 							type='button'
