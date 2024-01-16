@@ -49,8 +49,14 @@ export const useFirebaseUpdates = () => {
 		return updateDoc(docRef, preview)
 	}
 
+	const updateWeekPlan = (weekPlan: WeekPlan) => {
+		const docRef = doc(weeksCol, weekPlan._id)
+
+		return updateDoc(docRef, weekPlan)
+	}
+
 	const addPreviewToWeek = (generatedPreview: WeekPlan) => {
-		// creating a new document reference with a uuid in 'weeks' collection in firebase db
+		// creating a new document reference or finding the one that is already there
 		const docRef = doc(weeksCol, generatedPreview._id)
 
 		// setting the document with data from the generated preview
@@ -116,6 +122,13 @@ export const useFirebaseUpdates = () => {
 
 	}
 
+	const copyWeekIntoPreview = (weekPlan: WeekPlan) => {
+		// refererencing the collection and new doc
+		const docRef = doc(previewsCol, weekPlan._id)
+
+		return setDoc(docRef, weekPlan)
+	}
+
 	const createNewMeal = (data: CreateMealSchema, starRating: number | null, imageUrl: string | null | undefined) => {
 		if (!activeUser) { throw new Error("No active user") }
 
@@ -168,6 +181,7 @@ export const useFirebaseUpdates = () => {
 	return {
 		// functions
 		addPreviewToWeek,
+		copyWeekIntoPreview,
 		createNewMeal,
 		createNewWeek,
 		createNewWeekPreview,
@@ -176,6 +190,7 @@ export const useFirebaseUpdates = () => {
 		updateFirebaseDb,
 		updatePreview,
 		updateUserPreferences,
+		updateWeekPlan,
 
 		// error and loading states
 		errorMsg,

@@ -18,6 +18,7 @@ import { CreateMeal } from "./components/create-update-meal/CreateMeal"
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { MealDetails } from "./pages/auth-routes/MealDetails"
 import { AdvancedMenuGenerator } from "./pages/auth-routes/AdvancedMenuGenerator"
+import { EditWeek } from "./pages/auth-routes/EditWeek"
 
 export const App = () => {
 	return (
@@ -48,6 +49,13 @@ export const App = () => {
 							<AdvancedMenuGenerator />
 						</AuthControl>
 					} />
+
+					<Route path="/edit/week/:week/year/:year/previewId/:previewId" element={
+						<AuthControl>
+							<EditWeek />
+						</AuthControl>
+					} />
+
 					<Route path="/meal/:mealId" element={
 						<AuthControl>
 							<MealDetails />
