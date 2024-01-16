@@ -45,7 +45,7 @@ export const MealDetails = () => {
 					{meal.rating &&
 						<div>
 							{
-								[...Array(5)].map((star, index) => {
+								[...Array(5)].map((_, index) => {
 									return (
 										<span
 											key={index}

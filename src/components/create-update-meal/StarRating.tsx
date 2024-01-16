@@ -13,7 +13,7 @@ export const StarRating: React.FC<StarRatingProps> = ({ onClick, rating }) => {
 	return (
 		<div>
 			{
-				[...Array(totalStars)].map((star, index) => {
+				[...Array(totalStars)].map((_, index) => {
 					const currentRating = index + 1;
 
 					return (
