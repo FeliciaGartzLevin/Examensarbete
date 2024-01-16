@@ -102,7 +102,7 @@ export const LandingPage = () => {
 					more info about, edit, comment on
 					or rate it. Click on the pen
 					on this page to edit the week.
-					If you are finished editing,s
+					If you are finished editing,
 					click the check symbol in order to
 					save your changes.
 				</p>
