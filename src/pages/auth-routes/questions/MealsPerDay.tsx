@@ -46,7 +46,6 @@ export const MealsPerDay: React.FC<QuestionsProps> = ({ userDocs, isLoading, act
 		<div className="flex flex-col gap-4 text-center">
 			<div>
 				<h3 className="mb-2">How many meals per day do you wish to see in your mealplan?</h3>
-				<p className="text-xs text-gray-500">You can choose more than one option.</p>
 			</div>
 			{errorMsg &&
 				<Alert body={errorMsg} color='red' />
