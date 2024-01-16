@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { UserDoc } from '../../types/User.types'
 import { Button } from '../generic-utilities/Button'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from '../generic-utilities/LoadingSpinner'
 import { Alert } from '../generic-utilities/Alert'
 import { useErrorHandler } from '../../hooks/useErrorHandler'
@@ -32,6 +32,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 	const [mealAmountEnough, setMealAmoutEnough] = useState<boolean>(true)
 	const { getWeekPlan } = useFirebaseUpdates()
 	const { generatePreview } = useGeneratePreview('generate')
+	const { refetchWeekNavState } = useLocation().state || {}
 
 	if (!activeUser) { throw new Error("No active user") }
 
@@ -109,6 +110,11 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 		}
 
 	}
+
+	useEffect(() => {
+		refetchWeekDocs()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [refetchWeekNavState])
 
 	if (isLoadingMealsDocsLenght || isLoadingWeeksDocs || loading) {
 		return <LoadingSpinner />

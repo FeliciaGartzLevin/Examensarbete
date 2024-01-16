@@ -33,7 +33,7 @@ export const EditWeek = () => {
 	const [clickedModal, setClickedModal] = useState<ClickedBtnType | null>(null)
 	const { windowWidth, windowSizeisLoading } = useWindowSize()
 	const [showInfo, setShowInfo] = useState<boolean>(false)
-	const [areUSure, setAreUSure] = useState<boolean>(true)
+	const [areUSure, setAreUSure] = useState<boolean>(false)
 	const { getPreview, addPreviewToWeek, updatePreview } = useFirebaseUpdates()
 	const navigate = useNavigate()
 	const {
@@ -173,7 +173,11 @@ export const EditWeek = () => {
 			// delete preview
 			await deleteFirebaseDoc(previewsCol, previewId)
 
-			navigate(`/?week=${displayedWeek}&year=${displayedYear}`)
+			navigate(`/?week=${displayedWeek}&year=${displayedYear}`, {
+				state: {
+					refetchWeekNavState: true
+				}
+			})
 
 		} catch (error) {
 			handleError(error)
@@ -193,7 +197,11 @@ export const EditWeek = () => {
 
 			await deleteFirebaseDoc(previewsCol, previewId)
 
-			navigate(`/?week=${displayedWeek}&year=${displayedYear}`)
+			navigate(`/?week=${displayedWeek}&year=${displayedYear}`, {
+				state: {
+					refetchWeekNavState: true
+				}
+			})
 
 			// refetch weekplans here somehow - send state?
 
