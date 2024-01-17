@@ -14,28 +14,35 @@ export const useGeneratePreview = (action: 'generate' | 'edit') => {
 		try {
 			resetError()
 			setLoadingStatus(true)
+			console.log('generatePreview check 1');
 
 			// checking if preview exist for displayedWeek and year
 			const preview = await getPreview(displayedWeek, displayedYear)
 
 			// if preview exists
 			if (preview.length) {
+				console.log('generatePreview check 2');
 
 				// if preview exists, check if the user preferences are same like the current user preferences settings
 				if (preview[0].userPreferences.mealsPerDay === userDoc.preferences.mealsPerDay
 					&& preview[0].userPreferences.generateFrom === userDoc.preferences.generateFrom
 					&& preview[0].userPreferences.foodPreferences.every((preference, index) => preference === userDoc.preferences.foodPreferences[index])
 				) {
+					console.log('generatePreview check 3');
+
 					// if so, navigate to mealPlan
 					return navigate(`/${action}/week/${displayedWeek}/year/${displayedYear}/previewId/${preview[0]._id}`)
 
-				} else {
+				} else if (action === 'generate') {
+					console.log('generatePreview check 4');
 					//  if else delete it in order to generate a new preview that applies to current user preferences
 					await deleteFirebaseDoc(previewsCol, preview[0]._id)
 				}
 			}
 
 			if (action === 'generate') {
+				console.log('generatePreview check 5');
+
 				//if preview doesn't exist
 				// create a new preview and then navigate to it's page
 				const newPreviewId = await createNewWeekPreview(userDoc.preferences, displayedWeek, displayedYear)

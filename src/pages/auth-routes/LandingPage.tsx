@@ -118,7 +118,7 @@ export const LandingPage = () => {
 				<Alert color="red" body={'An error occured' + error ? + `: ${error}` : '.'} />
 			}
 
-			{userDocs && userDocs[0] && !isLoading &&
+			{userDocs && !isLoading &&
 				<MealPlan userDoc={userDocs[0]} />
 			}
 

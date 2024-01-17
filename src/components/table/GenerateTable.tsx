@@ -222,7 +222,7 @@ export const GenerateTable = () => {
 			await deleteFirebaseDoc(previewsCol, preview[0]._id)
 
 			// navigate to landing for displayedweek, to see the new weekplan
-			navigate(`/?week=${displayedWeek}&year=${displayedYear}`)
+			navigate(`/?week=${displayedWeek}&year=${displayedYear}`, { replace: true })
 
 		} catch (error) {
 			handleError(error)

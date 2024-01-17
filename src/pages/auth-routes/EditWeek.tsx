@@ -64,6 +64,7 @@ export const EditWeek = () => {
 		data: mealDocs,
 		isLoading: isLoadingMealsDocs,
 		isError: isErrorMealsDocs,
+		// isSuccess: isSuccessMealDocs,
 		error: mealsDocsError,
 	} = useQuery({
 		queryKey: ['All meals by user preferences'],
@@ -88,9 +89,7 @@ export const EditWeek = () => {
 		staleTime: 1 * 1000 // 1sec
 	})
 
-	const oneMeal = userDocs && userDocs[0].preferences?.mealsPerDay === 1
 	const weekPreview = weekPreviews && weekPreviews[0]
-
 
 	/**
 	 * Functions for the table
@@ -200,7 +199,8 @@ export const EditWeek = () => {
 			navigate(`/?week=${displayedWeek}&year=${displayedYear}`, {
 				state: {
 					refetchWeekNavState: true
-				}
+				},
+				replace: true
 			})
 
 			// refetch weekplans here somehow - send state?
@@ -340,7 +340,7 @@ export const EditWeek = () => {
 						editTable={true}
 						weekOrPreviewDoc={weekPreviews[0]}
 						mealDocs={mealDocs}
-						oneMeal={oneMeal}
+						oneMeal={weekPreviews[0].userPreferences.mealsPerDay === 1}
 						handleDeleteClick={handleDeleteClick}
 						handleEditClick={handleEditClick}
 					/>
