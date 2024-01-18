@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { fetchFirebaseDocs, mealsCol } from '../../services/firebase'
 import { Meal } from '../../types/Meal.types'
-import { where } from 'firebase/firestore'
 import { GenericTable } from './GenericTable'
 import { FaPencilAlt } from 'react-icons/fa'
 import { useGeneratePreview } from '../../hooks/firebase/useGeneratePreview'
@@ -53,9 +52,9 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc, userDoc }) => {
 	} = useQuery({
 		queryKey: ["weekPlanMeals", { week: displayedWeek, year: displayedYear, ids: getMealIds() }],
 		queryFn: () => fetchFirebaseDocs<Meal>(
-			mealsCol,
-			[where('_id', 'in', getMealIds())]
-		)
+			mealsCol, []
+			// [where('_id', 'in', getMealIds())]
+		),
 	})
 
 

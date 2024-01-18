@@ -37,7 +37,7 @@ export const MealDetails = () => {
 		<ContentContainer className="gap-6 pb-14">
 			{isError && error && <Alert color='red' header={error.name || "Error"} body={error.message || "An error occured"} />}
 
-			{meal?.imageUrl && <img src={meal.imageUrl} />}
+			{meal?.imageUrl && <img className="lg:max-w-[50vw]" src={meal.imageUrl} />}
 
 			{meal && (
 				<>
