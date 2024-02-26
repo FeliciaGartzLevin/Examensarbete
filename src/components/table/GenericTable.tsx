@@ -124,7 +124,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 	}
 
 	return (
-		<div className='border border-black rounded-2xl'>
+		<div className='border border-black rounded-2xl mx-auto'>
 
 			<div className='overflow-x-scroll no-scrollbar'>
 

@@ -20,7 +20,7 @@ export const Pagination: React.FC<PaginationProps> = ({ header, onClickBack, onC
 			<p>{header}</p>
 			<button
 				type='button'
-				title='back'
+				title='forward'
 				onClick={onClickForward}
 			>
 				<FaArrowRightLong size={23} />

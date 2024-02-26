@@ -81,7 +81,7 @@ export const WeekTable: React.FC<WeekTableProps> = ({ weekDoc, userDoc }) => {
 				<button
 					onClick={() => generatePreview(userDoc, displayedWeek, displayedYear, weekDoc!)}
 					type='button'
-					title={'Edit meal slot'}
+					title='Edit meal slot'
 					className='text-green-800 hover:bg-button-green-hover hover:text-white border border-black rounded-md p-2'
 					disabled={loading}
 				>

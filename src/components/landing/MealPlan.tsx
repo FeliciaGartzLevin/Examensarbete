@@ -137,8 +137,7 @@ export const MealPlan: React.FC<MealPlanProps> = ({ userDoc }) => {
 				}
 			/>}
 
-			{/* consider making this whole block to a component (if I can avoid prop drilling) */}
-			{!weeksDocs?.length && isSuccessmealsDocsLenght && !!mealsDocsLenght &&
+			{!weeksDocs?.length && isSuccessmealsDocsLenght &&
 				<>
 					{!mealAmountEnough &&
 						<section className="flex flex-col items-center gap-4 sm:px-14 md:px-20 lg:px-60">
