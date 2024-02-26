@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 import Color from 'color';
 
+const primaryColors = {
+	'neutral': '#968BAF',
+}
+
 const lighten = (clr, val) => Color(clr).lighten(val).hex()
 // const darken = (clr, val) => Color(clr).darken(val).hex()
 
@@ -12,8 +16,6 @@ export default {
 	theme: {
 		extend: {
 			backgroundImage: {
-				'light-dinner': "url('/src/assets/img/light-dinner.jpg')",
-				'dark-dinner': "url('/src/assets/img/dark-dinner.jpg')",
 				'neutral-dinner': "url('/src/assets/img/neutral-dinner.jpg')",
 			},
 			colors: {
@@ -26,7 +28,9 @@ export default {
 					'green-hover': '#188C57',
 					'red': '#990B00',
 					'red-hover': '#660700',
-					'neutral': '#968BAF',
+					'neutral': primaryColors.neutral,
+					'neutral-soft': lighten(primaryColors.neutral, 0.3),
+					'neutral-lighter': lighten(primaryColors.neutral, 0.4),
 					'neutral-hover': '#7A74A4',
 				},
 				alert: {
@@ -36,7 +40,7 @@ export default {
 					'lighter-green': lighten('green', 2.5),
 					'orange': '#F08F0E',
 					'lighter-orange': lighten('orange', 0.9),
-				}
+				},
 			},
 			fontFamily: {
 				primary: ['"Montserrat"', 'sans-serif']

@@ -131,7 +131,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 				<table className="table-auto text-left overflow-x-scroll no-scrollbar">
 
 					<thead>
-						<tr className='bg-slate-200'>
+						<tr className='bg-button-neutral-soft'>
 							<th>Day</th>
 							{oneMeal &&
 								<th >Meal</th>
@@ -148,7 +148,7 @@ export const GenericTable: React.FC<GenericTableProps> = ({
 					<tbody>
 						{weekArr.map((weekday, index) => {
 							return (
-								<tr key={index} className='odd:bg-white even:bg-slate-100'>
+								<tr key={index} className='odd:bg-white even:bg-button-neutral-lighter'>
 
 									{/* Always render name of weekday */}
 									<td>

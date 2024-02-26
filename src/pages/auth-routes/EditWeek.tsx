@@ -16,7 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { useStreamUserDoc } from '../../hooks/firebase/useStreamUserDoc'
 import { FaCheck } from 'react-icons/fa6'
-import { ImCross } from 'react-icons/im'
+import { MdCancel } from "react-icons/md";
 import { ContentContainer } from '../../components/generic-utilities/ContentContainer'
 import { PageInfo } from '../../components/generic-utilities/PageInfo'
 import { Button } from '../../components/generic-utilities/Button'
@@ -315,7 +315,7 @@ export const EditWeek = () => {
 
 			{weekPreviews &&
 				<>
-					<section className="flex justify-center gap-3">
+					<section className="flex justify-center gap-4">
 
 						<button
 							onClick={handleClickSave}
@@ -324,14 +324,14 @@ export const EditWeek = () => {
 							title={'Save changes'}
 							className='text-green-800 hover:bg-button-green-hover hover:text-white border border-black rounded-md p-2'
 						>
-							<FaCheck size={20} />
+							<FaCheck size={25} />
 						</button>
 
 						<button
 							onClick={handleCancelEditing}
 							title='Cancel editing'
 							className='text-button-red text-lg hover:bg-button-red hover:text-white border border-black rounded-md p-2'>
-							<ImCross />
+							<MdCancel size={25} />
 						</button>
 
 					</section>
