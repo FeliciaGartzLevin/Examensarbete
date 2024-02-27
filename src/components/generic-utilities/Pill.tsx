@@ -16,7 +16,7 @@ export const Pill: React.FC<PillProps> = ({ children, onClick, py = 'py-2', isAc
 			disabled={disabled}
 			type='button'
 			onClick={onClick}
-			className={'px-3 min-w-[2.5rem] border-black rounded-xl ' + py + (isActive ? ' border-2 bg-gray-300' : ' border') + ' ' + (className ?? '')}
+			className={'px-3 min-w-[2.5rem] border-black rounded-xl box-border ' + py + (isActive ? ' border-2 bg-button-neutral-soft' : ' border') + ' ' + (className ?? '')}
 		>
 			<p className='font-medium'>
 				{children}

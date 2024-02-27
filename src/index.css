@@ -25,7 +25,7 @@
 
 	/* active link */
 	.active {
-		@apply font-semibold underline underline-offset-8
+		@apply font-semibold underline underline-offset-8 decoration-button-neutral;
 	}
 
 	.h2 {

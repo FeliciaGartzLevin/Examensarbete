@@ -29,8 +29,8 @@ export default {
 					'red': '#990B00',
 					'red-hover': '#660700',
 					'neutral': primaryColors.neutral,
-					'neutral-soft': lighten(primaryColors.neutral, 0.3),
-					'neutral-lighter': lighten(primaryColors.neutral, 0.4),
+					'neutral-soft': lighten(primaryColors.neutral, 0.4),
+					'neutral-lighter': lighten(primaryColors.neutral, 0.5),
 					'neutral-hover': '#7A74A4',
 				},
 				alert: {

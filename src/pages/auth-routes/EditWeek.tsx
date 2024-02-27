@@ -262,7 +262,7 @@ export const EditWeek = () => {
 							<Button
 								onClick={() => setAreUSure(false)}
 								title='Cancel the deletion'
-								color='red'
+								color='neutral'
 								style='ring'>
 								Cancel
 							</Button>
